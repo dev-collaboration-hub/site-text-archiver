@@ -27,95 +27,115 @@ Progress percentages represent working product capability, not documentation vol
 
 ## M0 — Project Foundation
 
+### Status
+
+**Implemented in source. Browser installation acceptance remains to be manually confirmed.**
+
 ### Goal
 
 Create an installable Chrome Manifest V3 extension skeleton and the shared foundation needed by later modules.
 
-### Deliverables
+### Implemented Deliverables
 
 - `manifest.json`
 - Background service worker
-- Popup shell
-- Dashboard shell
-- Shared constants and message types
-- ID and result helpers
-- Basic local settings storage
-- Test harness without npm
-- License and solo implementation documentation
+- Popup configuration interface
+- Dashboard foundation
+- Shared constants
+- Result and identifier helpers
+- Typed message foundation
+- Settings validation and local persistence
+- Scratch browser test harness
+- MIT license
+- Solo implementation documentation
 
-### Acceptance Criteria
+### Verification Completed
 
-- Extension loads through Chrome's Load Unpacked flow.
-- Popup opens without console errors.
-- Dashboard opens from the popup.
-- Popup and service worker exchange a validated message.
-- Settings survive browser restart.
-- Test harness runs and reports results.
+- JavaScript syntax checks passed locally.
+- Result-contract smoke tests passed.
+- Identifier-helper smoke tests passed.
+- Settings normalization and validation smoke tests passed.
+- Message-contract smoke tests passed.
 
-### Product Completion
+### Remaining Acceptance
+
+- Load unpacked in Chrome.
+- Confirm popup opens without console errors.
+- Confirm dashboard opens.
+- Confirm settings persist after browser restart.
+
+### Estimated Product Completion
 
 10%
 
 ---
 
-## M1 — URL Intelligence and Crawl Scope
+## M1 — URL Intelligence and Safety
 
 ### Goal
 
-Implement canonical URL normalization, origin/path enforcement, filtering, and duplicate URL prevention.
+Build URL normalization, origin/path validation, include/exclude filtering, file-extension filtering, and duplicate URL intelligence.
 
 ### Deliverables
 
-- Relative URL resolver
+- URL resolver
 - Canonical URL normalizer
-- Query-parameter policy
 - Origin and path guard
-- Include and exclude patterns
-- Blocked extension policy
-- Action-link filter
-- Visited and queued URL registries
-- Machine-readable reason codes
+- Include and exclude pattern support
+- Blocked extension list
+- Unsafe action-link detector
+- Duplicate URL registry
+- Machine-readable decision reasons
+
+### Required Tests
+
+- Relative and absolute URLs
+- Fragments
+- Default ports
+- Query parameters
+- Trailing slash handling
+- Out-of-origin URLs
+- Out-of-path URLs
+- Unsupported protocols
+- Account-action links
+- Circular URLs
 
 ### Acceptance Criteria
 
 - Equivalent URLs resolve to one canonical key.
 - Every rejected URL has an explicit reason.
-- Out-of-scope URLs never enter the queue.
-- URL and scope tests pass.
+- Out-of-scope links cannot enter the crawl queue.
 
-### Product Completion
+### Estimated Product Completion
 
 20%
 
 ---
 
-## M2 — Crawl Queue and Resumable State
+## M2 — Crawl Queue and State Machine
 
 ### Goal
 
-Create deterministic scheduling and persisted crawl lifecycle management.
+Create deterministic crawl scheduling and resumable state management.
 
 ### Deliverables
 
 - Crawl state machine
-- Stable priority queue
+- Priority task queue
 - Crawl configuration validation
 - Page, depth, delay, and retry limits
-- Pause, resume, and cancel controls
-- Persisted task state
+- Pause, resume, cancel controls
+- Persisted queue state
 - Crawl statistics
 - Progress events
-- Restart recovery
 
 ### Acceptance Criteria
 
 - Queue order is deterministic.
-- Invalid transitions are rejected.
-- Duplicate tasks are rejected.
+- Invalid state transitions are rejected.
 - Restarting the service worker does not lose completed tasks.
-- Pause, resume, cancel, and recovery tests pass.
 
-### Product Completion
+### Estimated Product Completion
 
 32%
 
@@ -125,30 +145,27 @@ Create deterministic scheduling and persisted crawl lifecycle management.
 
 ### Goal
 
-Fetch approved HTML pages under bounded controls and discover additional documentation links.
+Fetch allowed HTML pages and discover new documentation links.
 
 ### Deliverables
 
-- Request-delay policy
-- Fetch timeout and abort handling
-- HTTP response classification
+- Fetch timeout handling
+- Response classification
 - HTML content-type validation
-- Redirect revalidation
+- Request delay policy
 - Link extraction
-- `<base>` URL support
+- Base URL handling
 - Canonical-link awareness
-- Failure records
+- Fetch failure records
 - Retry classification
 
 ### Acceptance Criteria
 
 - Only approved HTML pages are processed.
-- Temporary and permanent failures are distinguished.
-- Redirects are rechecked against crawl scope.
-- Discovered links pass normalization and scope checks.
-- Circular links do not create an unbounded queue.
+- Temporary and permanent failures are classified separately.
+- Newly discovered links pass normalization and scope checks.
 
-### Product Completion
+### Estimated Product Completion
 
 43%
 
@@ -158,45 +175,43 @@ Fetch approved HTML pages under bounded controls and discover additional documen
 
 ### Goal
 
-Extract readable technical documentation while preserving useful structure.
+Extract useful documentation content while preserving technical structure.
 
 ### Deliverables
 
-- Safe DOM parsing copy
 - DOM cleanup
-- Main-content candidate scoring
+- Main-content candidate detection
+- Text-density scoring
 - Heading hierarchy extraction
 - Paragraph extraction
 - Ordered and unordered lists
 - Table conversion
-- Code-block preservation
-- Relevant-link preservation
-- Page metadata
+- Code block preservation
+- Relevant link preservation
+- Page metadata extraction
 - Extraction warnings
 
 ### Acceptance Criteria
 
-- Article and sidebar-heavy fixtures select the useful content.
-- Headings, lists, tables, and code remain readable.
-- Duplicate block emission is prevented.
-- Navigation and repeated interface text are substantially reduced.
-- Extraction tests pass.
+- Extracted content remains readable and structurally correct.
+- Code blocks and tables remain usable.
+- Navigation and repeated interface content are substantially reduced.
 
-### Product Completion
+### Estimated Product Completion
 
 58%
 
 ---
 
-## M5 — Markdown, JSON, and Reports
+## M5 — Markdown and JSON Archive Generation
 
 ### Goal
 
-Generate deterministic source-backed archives and crawl reports.
+Generate deterministic, source-backed archives.
 
 ### Deliverables
 
-- Page-to-Markdown renderer
+- Page-to-Markdown converter
 - Stable page ordering
 - Heading-level normalization
 - Source URL blocks
@@ -206,50 +221,44 @@ Generate deterministic source-backed archives and crawl reports.
 - Crawl report
 - Failed-page report
 - Browser download integration
-- Archive validation
 
 ### Acceptance Criteria
 
-- The same stored snapshot produces byte-stable output.
-- Code fences and tables render correctly.
-- Every exported page includes its source.
-- Empty or invalid archives are rejected.
-- Golden export tests pass.
+- The same stored crawl produces the same export.
+- Markdown renders correctly.
+- Every page retains its source URL.
 
-### Product Completion
+### Estimated Product Completion
 
 68%
 
 ---
 
-## M6 — Offline Agent and Quality System
+## M6 — Offline Agent Controller and Quality System
 
 ### Goal
 
-Add deterministic planning, page-quality analysis, duplicate analysis, and bounded recovery.
+Add deterministic planning, quality scoring, and bounded recovery decisions.
 
 ### Deliverables
 
 - Agent controller
-- Initial planner
-- Crawl priority scoring
-- Content-quality scoring
-- Exact duplicate detector
-- Near-duplicate detector
-- Boilerplate frequency model
+- Initial crawl planner
+- Page priority scoring
+- Content quality scoring
+- Duplicate-content detector
+- Boilerplate detector
 - Recovery manager
-- Decision-event log
-- Final archive checks
+- Final archive validator
+- Decision event log
 
 ### Acceptance Criteria
 
-- Every agent decision has a reason and evidence.
+- Every agent decision includes evidence and a reason code.
 - Retry behavior is bounded.
-- Weak pages are flagged or retried through documented rules.
-- Duplicate relations are reported rather than silently discarded.
-- Controller and quality tests pass.
+- Low-quality content is flagged rather than silently accepted.
 
-### Product Completion
+### Estimated Product Completion
 
 78%
 
@@ -259,31 +268,28 @@ Add deterministic planning, page-quality analysis, duplicate analysis, and bound
 
 ### Goal
 
-Make downloaded documentation searchable without external services.
+Make archived documentation searchable without external services.
 
 ### Deliverables
 
-- Technical tokenizer
+- Tokenizer
 - Text normalizer
 - Stop-word policy
 - Section splitter
 - Inverted index
-- Heading/body weighting
+- Heading weighting
 - Document-frequency statistics
-- Phrase and proximity preference
-- Search snippets
+- Phrase preference
+- Search result snippets
 - Source filters
-- Incremental re-indexing
 
 ### Acceptance Criteria
 
 - Search returns relevant sections.
-- Heading and rare-term matches receive appropriate weight.
-- Results have stable ordering and source references.
-- Re-indexing does not leave stale postings.
-- Search tests pass.
+- Heading matches receive appropriate weight.
+- Results are deterministic and source-linked.
 
-### Product Completion
+### Estimated Product Completion
 
 87%
 
@@ -293,14 +299,15 @@ Make downloaded documentation searchable without external services.
 
 ### Goal
 
-Answer questions only through evidence contained in the local archive.
+Answer questions using only archived evidence.
 
 ### Deliverables
 
-- Question processing
-- Candidate-section retrieval
-- Passage-window creation
+- Question tokenizer
+- Query-term weighting
+- Candidate retrieval
 - Passage ranking
+- Answer passage extraction
 - Multiple-source support
 - Confidence indicators
 - Insufficient-evidence response
@@ -308,29 +315,27 @@ Answer questions only through evidence contained in the local archive.
 
 ### Acceptance Criteria
 
-- Answers return extracted supporting passages.
-- Every answer includes source information.
+- Answers cite source pages.
 - Unsupported questions return insufficient evidence.
-- Candidate and passage limits are enforced.
-- Repeated runs produce stable ordering.
+- The engine does not invent missing facts.
 
-### Product Completion
+### Estimated Product Completion
 
 93%
 
 ---
 
-## M9 — Complete Dashboard and Release Candidate
+## M9 — Dashboard, Reliability, and Functional Release
 
 ### Goal
 
-Finish the user experience, reliability work, examples, and release-ready functional build.
+Complete the user experience, reliability checks, and functional release preparation.
 
 ### Deliverables
 
 - Full crawl dashboard
-- Queue and current-task views
-- Completed, skipped, and failed-page views
+- Queue visualization
+- Failed/skipped inspection
 - Quality report UI
 - Search UI
 - Question-answering UI
@@ -338,25 +343,25 @@ Finish the user experience, reliability work, examples, and release-ready functi
 - Accessibility pass
 - Performance profiling
 - Example archives
-- Installation and usage guide
+- Installation and usage documentation
 - Functional release checklist
 
-Dedicated security and privacy hardening remain deferred in `docs/DEFERRED_SECURITY_PRIVACY_WORK.md` and are not part of the present functional testing gate.
+Dedicated security and privacy hardening remains deferred to `DEFERRED_SECURITY_PRIVACY_WORK.md`.
 
 ### Acceptance Criteria
 
 - A non-developer can install and use the extension.
-- A complete crawl can be monitored, resumed, inspected, searched, and exported.
-- Interrupted sessions do not falsely complete or corrupt pages.
+- A complete crawl can be inspected and exported.
+- Interrupted sessions do not corrupt completed data.
 - Core workflows have automated and manual test evidence.
 
-### Product Completion
+### Estimated Product Completion
 
-100% of the current functional scope
+100%
 
 ---
 
-## 3. Build Order
+## Recommended Build Order
 
 ```text
 M0 Foundation
@@ -366,32 +371,11 @@ M0 Foundation
 -> M4 Extraction
 -> M5 Export
 -> M6 Agent and Quality
--> M7 Search
+-> M7 Local Search
 -> M8 Question Answering
--> M9 Dashboard and Functional Release
+-> M9 Functional Release
 ```
 
-## 4. First Usable Prototype
+## Current Next Target
 
-M0 through M5 form the first useful prototype. It must:
-
-- Load as a Chrome extension
-- Crawl a bounded documentation fixture
-- Normalize and filter links
-- Avoid duplicate crawling
-- Extract technical content
-- Persist results
-- Export Markdown, JSON, and reports
-
-Offline agent control, local search, and question answering are added only after the basic archiver pipeline is reliable.
-
-## 5. Execution Checkpoint Rule
-
-After each milestone, ChatGPT must:
-
-1. Inspect the actual repository state.
-2. Implement missing files.
-3. Run or construct the required tests.
-4. Fix detected failures.
-5. Update milestone status honestly.
-6. Continue to the next milestone only after the current milestone's acceptance criteria are met.
+M1 URL Intelligence and Safety.
