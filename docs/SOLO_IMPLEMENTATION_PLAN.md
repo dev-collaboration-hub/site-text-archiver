@@ -163,13 +163,13 @@ Test progress
 Overall functional product progress
 ```
 
-Example:
+Current status after the first source-code milestone:
 
 ```text
-Documentation: 97%
-Implementation: 10%
-Tests implemented: 5%
-Overall functional product: 8%
+Documentation: approximately 97%
+Implementation: M0 foundation committed
+Tests: M0 pure-module smoke tests passing locally
+Overall functional product: early foundation stage
 ```
 
 A high documentation percentage must never be presented as a high product-completion percentage.
@@ -210,19 +210,21 @@ Permitted foundations include:
 - Chrome Extension APIs
 - Browser-native Web Crypto
 
-## 13. Immediate Next Work
+## 13. Current Implementation State
 
-The documentation foundation is sufficiently detailed to begin source implementation.
-
-The next implementation target is **M0 — Project Foundation**:
+M0 source implementation now includes:
 
 ```text
 manifest.json
+LICENSE
 src/background/service-worker.js
 src/messaging/message-types.js
 src/messaging/message-validator.js
+src/messaging/runtime-client.js
+src/shared/constants.js
 src/shared/result.js
 src/shared/id.js
+src/storage/settings-store.js
 popup/popup.html
 popup/popup.css
 popup/popup.js
@@ -232,7 +234,10 @@ dashboard/dashboard.js
 tests/index.html
 tests/test-runner.js
 tests/assertions.js
+tests/unit/index.test.js
 ```
+
+The next implementation target is **M1 — URL Intelligence and Safety**.
 
 ## 14. Completion Objective
 
@@ -245,5 +250,3 @@ The final objective is not to create work for contributors. The objective is to 
 - Build a local search index
 - Return source-backed extractive answers
 - Provide a usable popup and dashboard
-
-The project should progress from documentation into working implementation immediately after the remaining documentation cleanup is finished.
