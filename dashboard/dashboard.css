@@ -1,0 +1,19 @@
+:root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; background: Canvas; color: CanvasText; }
+main { width: min(1050px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 64px; }
+.hero { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.eyebrow { margin: 0; font-size: 13px; opacity: .65; }
+h1 { margin: 4px 0 0; font-size: clamp(28px, 5vw, 48px); }
+button { border: 0; border-radius: 8px; padding: 10px 14px; background: AccentColor; color: AccentColorText; font: inherit; font-weight: 700; cursor: pointer; }
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 28px 0; }
+.cards article, .panel { border: 1px solid color-mix(in srgb, CanvasText 16%, transparent); border-radius: 14px; padding: 18px; }
+.cards span { display: block; opacity: .65; font-size: 13px; }
+.cards strong { display: block; margin-top: 8px; font-size: 24px; }
+.panel { margin-top: 14px; }
+.panel h2 { margin-top: 0; }
+dl { display: grid; grid-template-columns: max-content 1fr; gap: 10px 20px; margin: 0; }
+dt { font-weight: 700; }
+dd { margin: 0; overflow-wrap: anywhere; }
+#status { min-height: 24px; }
+@media (max-width: 650px) { .cards { grid-template-columns: 1fr; } dl { grid-template-columns: 1fr; gap: 4px; } dd { margin-bottom: 10px; } }

@@ -1,0 +1,9 @@
+export const MESSAGE_TYPES = Object.freeze({
+  PING: "PING",
+  GET_STATUS: "GET_STATUS",
+  GET_SETTINGS: "GET_SETTINGS",
+  SAVE_SETTINGS: "SAVE_SETTINGS",
+  OPEN_DASHBOARD: "OPEN_DASHBOARD"
+});
+
+export const MESSAGE_TYPE_SET = new Set(Object.values(MESSAGE_TYPES));

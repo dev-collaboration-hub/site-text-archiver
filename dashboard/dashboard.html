@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Site Text Archiver Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <main>
+    <header class="hero">
+      <div><p class="eyebrow">Site Text Archiver</p><h1>Dashboard</h1></div>
+      <button id="refresh-button" type="button">Refresh</button>
+    </header>
+
+    <section class="cards" aria-label="Foundation status">
+      <article><span>Milestone</span><strong id="milestone">—</strong></article>
+      <article><span>Runtime state</span><strong id="runtime-state">—</strong></article>
+      <article><span>Version</span><strong id="version">—</strong></article>
+    </section>
+
+    <section class="panel">
+      <h2>Saved crawl setup</h2>
+      <dl id="settings-list"></dl>
+    </section>
+
+    <section class="panel">
+      <h2>Implementation status</h2>
+      <p>M0 provides the installable extension shell, runtime messaging, local settings, popup, dashboard, and scratch test harness. Crawling starts in later milestones.</p>
+    </section>
+
+    <p id="status" role="status" aria-live="polite"></p>
+  </main>
+  <script type="module" src="dashboard.js"></script>
+</body>
+</html>
