@@ -1,0 +1,113 @@
+name: Create project milestones
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/create-milestones.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  create-milestones:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create missing M0-M9 milestones
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.request
+          import urllib.error
+
+          token = os.environ["GITHUB_TOKEN"]
+          repository = os.environ["REPOSITORY"]
+          api_root = f"https://api.github.com/repos/{repository}"
+
+          milestones = [
+              {
+                  "title": "M0 — Project Foundation",
+                  "state": "closed",
+                  "description": "Create the installable Manifest V3 extension foundation: manifest, background service worker, popup, dashboard, shared contracts, local settings, and scratch test harness.\n\nStatus: implemented; manual Chrome Load Unpacked acceptance remains to be performed.",
+              },
+              {
+                  "title": "M1 — URL Intelligence and Safety",
+                  "state": "open",
+                  "description": "Implement deterministic URL resolution and canonicalization, origin/path scope rules, include/exclude patterns, blocked extensions, action-link filtering, duplicate URL registry, reason codes, and complete unit tests.",
+              },
+              {
+                  "title": "M2 — Crawl Queue and State Machine",
+                  "state": "open",
+                  "description": "Implement the stable priority queue, crawl state machine, validated crawl configuration, page/depth/delay/retry limits, pause/resume/cancel, persisted queue state, statistics, progress events, and restart recovery.",
+              },
+              {
+                  "title": "M3 — Page Fetching and Link Discovery",
+                  "state": "open",
+                  "description": "Implement controlled HTML fetching, timeout and response classification, request delay policy, redirect validation, internal-link discovery, base URL handling, canonical-link awareness, failure records, and retry classification.",
+              },
+              {
+                  "title": "M4 — Semantic Content Extraction",
+                  "state": "open",
+                  "description": "Implement DOM cleanup, main-content scoring, heading and paragraph extraction, nested lists, tables, code preservation, useful links, metadata, extraction warnings, and fixture-driven extraction tests.",
+              },
+              {
+                  "title": "M5 — Markdown and JSON Archive Generation",
+                  "state": "open",
+                  "description": "Implement deterministic page ordering, Markdown conversion, heading normalization, source references, table of contents, combined Markdown, structured JSON, crawl and failure reports, validation, and browser downloads.",
+              },
+              {
+                  "title": "M6 — Offline Agent Controller and Quality System",
+                  "state": "open",
+                  "description": "Implement deterministic planning and decisions, priority scoring, page-quality scoring, exact and near-duplicate detection, boilerplate modelling, bounded recovery, final archive validation, and explainable decision logs.",
+              },
+              {
+                  "title": "M7 — Local Search Index",
+                  "state": "open",
+                  "description": "Implement local tokenization, normalization, section splitting, inverted index, heading weighting, document frequencies, phrase preference, snippets, source filters, deterministic ranking, and indexing tests.",
+              },
+              {
+                  "title": "M8 — Extractive Local Question Answering",
+                  "state": "open",
+                  "description": "Implement question processing, candidate retrieval, passage construction and ranking, multiple-source evidence, confidence indicators, insufficient-evidence responses, source attribution, and deterministic QA tests.",
+              },
+              {
+                  "title": "M9 — Dashboard, Reliability, and Functional Release",
+                  "state": "open",
+                  "description": "Complete the crawl dashboard, queue/page/failure inspection, quality views, local search and QA interfaces, export controls, accessibility, performance profiling, interruption recovery, example archives, user documentation, and version 1.0 functional release checklist. Dedicated security/privacy hardening remains deferred to its later milestone.",
+              },
+          ]
+
+          headers = {
+              "Accept": "application/vnd.github+json",
+              "Authorization": f"Bearer {token}",
+              "X-GitHub-Api-Version": "2022-11-28",
+              "User-Agent": "site-text-archiver-milestone-bootstrap",
+          }
+
+          def request(method, url, payload=None):
+              data = None if payload is None else json.dumps(payload).encode("utf-8")
+              req = urllib.request.Request(url, data=data, headers=headers, method=method)
+              with urllib.request.urlopen(req) as response:
+                  return json.load(response)
+
+          existing = request("GET", f"{api_root}/milestones?state=all&per_page=100")
+          existing_titles = {item["title"] for item in existing}
+
+          created = []
+          skipped = []
+          for milestone in milestones:
+              if milestone["title"] in existing_titles:
+                  skipped.append(milestone["title"])
+                  continue
+              request("POST", f"{api_root}/milestones", milestone)
+              created.append(milestone["title"])
+
+          print(json.dumps({"created": created, "already_present": skipped}, indent=2))
+          PY
