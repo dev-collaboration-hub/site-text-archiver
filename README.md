@@ -14,6 +14,14 @@ This project is being completed through a **single-owner implementation workflow
 
 The current goal is to complete the entire project directly rather than prepare tasks for other contributors.
 
+## Current Status
+
+- Documentation foundation: approximately 97%
+- M0 extension foundation: implemented
+- Pure-module M0 smoke tests: passing locally
+- Current functional product stage: early foundation
+- Next target: M1 URL intelligence and safety
+
 ## Project Goal
 
 Site Text Archiver collects connected documentation pages without requiring the user to open and copy every page manually.
@@ -33,26 +41,47 @@ The local agent plans the crawl, prioritizes pages, manages the queue, evaluates
 - Export combined Markdown, JSON, and crawl reports
 - Search archived documentation offline
 - Return source-backed extractive answers
-- Run without npm packages, a backend, or an online AI API
+- Operate without npm packages, a backend, or a hosted AI API
 
-## Offline Agent
+## Current M0 Foundation
 
-The agent is deterministic and task-specific. It is not dependent on an online language model.
+The repository currently includes:
 
-It uses locally implemented algorithms for:
+```text
+manifest.json
+LICENSE
+src/background/service-worker.js
+src/messaging/message-types.js
+src/messaging/message-validator.js
+src/messaging/runtime-client.js
+src/shared/constants.js
+src/shared/result.js
+src/shared/id.js
+src/storage/settings-store.js
+popup/popup.html
+popup/popup.css
+popup/popup.js
+dashboard/dashboard.html
+dashboard/dashboard.css
+dashboard/dashboard.js
+tests/index.html
+tests/test-runner.js
+tests/assertions.js
+tests/unit/index.test.js
+```
 
-- Crawl planning
-- URL priority scoring
-- Queue management
-- Main-content detection
-- Duplicate and near-duplicate detection
-- Boilerplate frequency analysis
-- Extraction-quality scoring
-- Failure classification and bounded recovery
-- Archive validation
-- Tokenization and inverted indexing
-- Section and passage ranking
-- Extractive question answering
+M0 provides:
+
+- Manifest V3 extension configuration
+- Background service-worker runtime
+- Typed runtime message foundation
+- Shared result and identifier helpers
+- Local settings validation and persistence
+- Popup configuration interface
+- Dashboard foundation
+- Scratch browser test harness
+
+Crawling, extraction, export, indexing, and question answering are implemented in later milestones.
 
 ## Technology
 
@@ -63,122 +92,60 @@ It uses locally implemented algorithms for:
 - Fetch API
 - DOMParser
 - IndexedDB
-- Web Workers or offscreen processing where required
+- Web Workers
 - Browser-native Web Crypto
 
-No npm dependency, cloud database, hosted model, external AI API, or backend server is required.
+No npm package, online AI API, server, or cloud database is required.
 
-## Planned Repository Structure
+## Installation
 
-```text
-site-text-archiver/
-├── manifest.json
-├── README.md
-├── LICENSE
-├── docs/
-├── src/
-│   ├── background/
-│   ├── crawler/
-│   ├── extraction/
-│   ├── storage/
-│   ├── export/
-│   ├── messaging/
-│   └── shared/
-├── agent/
-│   ├── controller.js
-│   ├── planner.js
-│   ├── task-queue.js
-│   ├── quality-checker.js
-│   ├── recovery-manager.js
-│   ├── indexer.js
-│   └── question-answering.js
-├── popup/
-├── dashboard/
-├── workers/
-├── assets/
-└── tests/
-```
+1. Clone or download this repository.
+2. Open Chrome.
+3. Visit `chrome://extensions/`.
+4. Enable **Developer mode**.
+5. Click **Load unpacked**.
+6. Select the project directory.
+7. Pin Site Text Archiver to the toolbar.
 
-## Main Workflow
+## M0 Usage
 
-```text
-User configuration
--> crawl planning
--> URL normalization and scope checks
--> priority queue
--> controlled page fetch
--> DOM parsing and content extraction
--> quality and duplicate analysis
--> local persistence
--> Markdown and JSON archive generation
--> local indexing
--> search and extractive question answering
--> final validation
-```
-
-## User Flow
-
-1. Open a documentation page.
-2. Open the extension popup.
-3. Confirm the starting URL, allowed origin, and path.
+1. Open any HTTP or HTTPS documentation page.
+2. Click the extension icon.
+3. Review or edit the detected start URL, origin, and path.
 4. Set page, depth, delay, and retry limits.
-5. Analyze the website.
-6. Start the crawl.
-7. Monitor progress in the dashboard.
-8. Pause, resume, or cancel when required.
-9. Inspect completed, skipped, and failed pages.
-10. Export Markdown, JSON, and reports.
-11. Search the local archive or ask a source-backed question.
+5. Click **Save setup**.
+6. Open the dashboard to confirm runtime and saved configuration.
 
-## Generated Files
+## Planned End-to-End Flow
 
 ```text
-documentation.md
-documentation.json
-crawl-report.json
-failed-pages.json
+Open documentation page
+-> configure crawl scope
+-> analyze website
+-> crawl bounded pages
+-> extract semantic content
+-> validate quality
+-> export Markdown and JSON
+-> build local search index
+-> ask source-backed questions
 ```
 
-## Implementation Roadmap
+## Documentation
 
-- **M0:** Extension foundation
-- **M1:** URL normalization and scope rules
-- **M2:** Crawl queue and resumable state machine
-- **M3:** Page fetching and link discovery
-- **M4:** Semantic content extraction
-- **M5:** Markdown and JSON export
-- **M6:** Offline agent, quality, duplicates, and recovery
-- **M7:** Local search index
-- **M8:** Extractive question answering
-- **M9:** Dashboard, reliability, and release completion
+Detailed specifications are available under `docs/`, including:
 
-Detailed execution rules are maintained in:
-
-```text
-docs/ROADMAP.md
-docs/SOLO_IMPLEMENTATION_PLAN.md
-docs/MODULE_SPECIFICATIONS.md
-docs/ALGORITHMS_AND_PSEUDOCODE.md
-docs/API_MESSAGE_DATA_CONTRACTS.md
-docs/TESTING_STRATEGY.md
-docs/UI_USER_FLOW_SPECIFICATION.md
-```
-
-## Completion Rule
-
-A feature is not complete merely because a placeholder or draft exists. Completion requires:
-
-- Working source files
-- Documented interfaces
-- Required tests
-- Passing expected behavior
-- Error handling
-- Updated progress documentation
-
-## Current Status
-
-The architecture and implementation documentation are nearly complete. Source-code implementation will proceed in milestone order, starting with M0 and continuing until the extension is usable end to end.
+- Project specification
+- Architecture
+- Roadmap
+- Module specifications
+- Algorithms and pseudocode
+- API, message, and data contracts
+- Testing strategy
+- UI and user-flow specification
+- Scratch development standard
+- Solo implementation plan
+- Deferred security and privacy work
 
 ## License
 
-This project is available under the MIT License.
+MIT License.
