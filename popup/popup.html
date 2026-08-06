@@ -10,7 +10,7 @@
   <main class="app-shell">
     <header>
       <h1>Site Text Archiver</h1>
-      <p class="subtitle">M0 foundation</p>
+      <p class="subtitle">M1 URL intelligence and safety</p>
     </header>
 
     <form id="settings-form" novalidate>
@@ -25,6 +25,7 @@
         <label>Retries<input id="retry-limit" name="retryLimit" type="number" min="0" max="10"></label>
       </div>
 
+      <label>Include patterns<textarea id="include-patterns" name="includePatterns" rows="3" placeholder="Optional; one pattern per line"></textarea></label>
       <label>Exclude patterns<textarea id="exclude-patterns" name="excludePatterns" rows="3" placeholder="One pattern per line"></textarea></label>
 
       <button id="save-button" type="submit">Save setup</button>
