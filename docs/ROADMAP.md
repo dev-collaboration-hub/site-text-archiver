@@ -75,39 +75,51 @@ Create an installable Chrome Manifest V3 extension skeleton and the shared found
 
 ## M1 — URL Intelligence and Safety
 
+### Status
+
+**Implemented in source and verified with pure-module tests.**
+
+Detailed implementation and evidence are recorded in `M1_IMPLEMENTATION_REPORT.md`.
+
 ### Goal
 
 Build URL normalization, origin/path validation, include/exclude filtering, file-extension filtering, and duplicate URL intelligence.
 
-### Deliverables
+### Implemented Deliverables
 
 - URL resolver
 - Canonical URL normalizer
-- Origin and path guard
+- Query-parameter policy
+- Exact origin and segment-aware path guard
 - Include and exclude pattern support
 - Blocked extension list
 - Unsafe action-link detector
 - Duplicate URL registry
-- Machine-readable decision reasons
+- Integrated URL intelligence pipeline
+- Machine-readable decision reasons and evidence
+- Popup persistence for include and exclude patterns
 
-### Required Tests
+### Verification Completed
 
-- Relative and absolute URLs
-- Fragments
-- Default ports
-- Query parameters
-- Trailing slash handling
-- Out-of-origin URLs
-- Out-of-path URLs
-- Unsupported protocols
-- Account-action links
-- Circular URLs
+- Relative and absolute URL tests
+- Fragment and trailing-slash tests
+- Default-port and hostname normalization tests
+- Unicode hostname and encoded-path tests
+- Query removal, retention, sorting, and repeated-value tests
+- Out-of-origin and out-of-path tests
+- Include and exclude filter tests
+- Unsupported-protocol and malformed-URL tests
+- Blocked extension tests
+- Unsafe account-action path and query tests
+- Page and depth limit tests
+- Duplicate and circular-equivalence tests
+- Integrated resolve, normalize, and scope-decision test
 
-### Acceptance Criteria
+### Acceptance Results
 
-- Equivalent URLs resolve to one canonical key.
-- Every rejected URL has an explicit reason.
-- Out-of-scope links cannot enter the crawl queue.
+- Equivalent URL forms resolve to one canonical key.
+- Every rejected URL returns an explicit machine-readable reason and evidence.
+- The M1 scope guard provides the required admission gate for future M2 queue scheduling and M3 link discovery.
 
 ### Estimated Product Completion
 
@@ -381,4 +393,4 @@ M0 Foundation
 
 ## Current Next Target
 
-M1 URL Intelligence and Safety.
+M2 Crawl Queue and State Machine.
