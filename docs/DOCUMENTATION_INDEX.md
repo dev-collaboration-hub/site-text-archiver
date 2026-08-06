@@ -36,11 +36,12 @@ The documentation describes the approved functional scope of the project. Workin
 10. `docs/REQUIREMENTS_TRACEABILITY.md`
 11. `docs/UI_USER_FLOW_SPECIFICATION.md`
 12. `docs/M0_BROWSER_ACCEPTANCE_CHECKLIST.md`
+13. `docs/M1_IMPLEMENTATION_REPORT.md`
 
 ### Execution and deferred work
 
-13. `docs/SOLO_IMPLEMENTATION_PLAN.md`
-14. `docs/DEFERRED_SECURITY_PRIVACY_WORK.md`
+14. `docs/SOLO_IMPLEMENTATION_PLAN.md`
+15. `docs/DEFERRED_SECURITY_PRIVACY_WORK.md`
 
 ## 3. Document Responsibilities
 
@@ -55,9 +56,10 @@ The documentation describes the approved functional scope of the project. Workin
 | `ALGORITHMS_AND_PSEUDOCODE.md` | Deterministic algorithms, scoring rules, state transitions, and processing steps | Algorithm design |
 | `SCRATCH_DEVELOPMENT_STANDARD.md` | No-dependency engineering rules, code quality rules, and implementation constraints | Engineering standard |
 | `TESTING_STRATEGY.md` | Test layers, fixtures, expected coverage, manual verification, and release evidence | Verification strategy |
-| `REQUIREMENTS_TRACEABILITY.md` | Mapping from product capabilities to milestones, design documents, implementation areas, and tests | Traceability control |
+| `REQUIREMENTS_TRACEABILITY.md` | Mapping from product capabilities to milestones, implementation areas, and test evidence | Traceability control |
 | `UI_USER_FLOW_SPECIFICATION.md` | Popup, dashboard, user actions, states, accessibility, and feedback behavior | UX contract |
 | `M0_BROWSER_ACCEPTANCE_CHECKLIST.md` | Manual Chrome verification required to accept the M0 extension foundation | M0 acceptance evidence |
+| `M1_IMPLEMENTATION_REPORT.md` | Implemented M1 source, reason codes, automated evidence, and M2/M3 integration boundary | M1 implementation evidence |
 | `SOLO_IMPLEMENTATION_PLAN.md` | Single-owner workflow, definition of done, repository write policy, and execution loop | Execution policy |
 | `DEFERRED_SECURITY_PRIVACY_WORK.md` | Explicitly deferred hardening tasks and release boundaries | Deferred scope register |
 
@@ -72,6 +74,7 @@ When documents overlap, use the following precedence:
 5. Algorithm details: `ALGORITHMS_AND_PSEUDOCODE.md`
 6. Test evidence and verification requirements: `TESTING_STRATEGY.md`
 7. UI behavior: `UI_USER_FLOW_SPECIFICATION.md`
+8. Implemented milestone evidence: milestone implementation reports
 
 If implementation and documentation disagree, the discrepancy must be recorded and corrected before the affected milestone is marked complete.
 
@@ -88,18 +91,26 @@ The documentation foundation is complete when:
 - UI states and user flows are defined.
 - Requirements are traceable to implementation and tests.
 - Manual M0 browser acceptance has a repeatable checklist.
+- Completed milestones have implementation evidence.
 - Deferred security and privacy work is explicitly separated from functional release scope.
 - The documentation set has a central index and clear authority rules.
 
-These conditions are now documented for the current approved scope.
+These conditions are documented for the current approved scope.
 
 ## 6. Current Documentation Status
 
 **Documentation foundation: 100% for the current approved project scope.**
 
-This does not mean the product is complete. Implementation remains milestone-driven, beginning with the implemented M0 foundation and continuing through M1–M9.
+Current implementation evidence:
 
-Documentation must continue to be maintained as implementation reveals necessary contract corrections, measured limits, browser-specific behavior, or scope changes.
+```text
+M0: source foundation implemented; Chrome acceptance pending
+M1: URL intelligence and safety implemented and pure-module verified
+Overall functional product completion: approximately 20%
+Next target: M2 Crawl Queue and State Machine
+```
+
+Documentation completeness does not mean the product is complete. Documentation must continue to be maintained as implementation reveals necessary contract corrections, measured limits, browser-specific behavior, or scope changes.
 
 ## 7. Synchronization Policy
 
