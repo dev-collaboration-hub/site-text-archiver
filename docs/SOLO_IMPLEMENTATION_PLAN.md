@@ -88,6 +88,8 @@ Documentation foundation
 -> M9 dashboard and functional release
 ```
 
+The documentation foundation is complete for the current approved scope. Implementation remains at the M0 foundation stage.
+
 ## 6. Milestone Execution Loop
 
 For each milestone, ChatGPT follows this loop:
@@ -150,6 +152,10 @@ ChatGPT must build and maintain:
 
 The current functional test scope is defined in `docs/TESTING_STRATEGY.md`.
 
+M0 manual Chrome verification is defined in `docs/M0_BROWSER_ACCEPTANCE_CHECKLIST.md`.
+
+Requirement-to-implementation and requirement-to-test mapping is maintained in `docs/REQUIREMENTS_TRACEABILITY.md`.
+
 Security and privacy hardening remain deferred in `docs/DEFERRED_SECURITY_PRIVACY_WORK.md`.
 
 ## 10. Progress Reporting
@@ -159,17 +165,19 @@ Progress must distinguish:
 ```text
 Documentation progress
 Implementation progress
-Test progress
+Automated test progress
+Manual acceptance progress
 Overall functional product progress
 ```
 
-Current status after the first source-code milestone:
+Current status:
 
 ```text
-Documentation: approximately 97%
+Documentation: 100% for the current approved scope
 Implementation: M0 foundation committed
-Tests: M0 pure-module smoke tests passing locally
-Overall functional product: early foundation stage
+Automated tests: M0 pure-module smoke tests reported passing locally
+Manual acceptance: M0 Chrome acceptance not yet recorded
+Overall functional product: approximately 10%, early foundation stage
 ```
 
 A high documentation percentage must never be presented as a high product-completion percentage.
@@ -235,6 +243,14 @@ tests/index.html
 tests/test-runner.js
 tests/assertions.js
 tests/unit/index.test.js
+```
+
+The documentation control layer now includes:
+
+```text
+docs/DOCUMENTATION_INDEX.md
+docs/REQUIREMENTS_TRACEABILITY.md
+docs/M0_BROWSER_ACCEPTANCE_CHECKLIST.md
 ```
 
 The next implementation target is **M1 — URL Intelligence and Safety**.
