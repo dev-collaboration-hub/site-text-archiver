@@ -9,6 +9,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   maxDepth: 5,
   requestDelayMs: 500,
   retryLimit: 2,
+  includePatterns: [],
   excludePatterns: []
 });
 
@@ -38,28 +39,50 @@ function normalizePathPrefix(value) {
     : withLeadingSlash;
 }
 
+function normalizePatterns(value) {
+  return Array.isArray(value)
+    ? [
+        ...new Set(
+          value
+            .filter(item => typeof item === "string")
+            .map(item => item.trim())
+            .filter(Boolean)
+        )
+      ]
+    : [];
+}
+
 export function normalizeSettings(input = {}) {
   const value = input && typeof input === "object" ? input : {};
-  const excludePatterns = Array.isArray(value.excludePatterns)
-    ? value.excludePatterns
-        .filter(item => typeof item === "string")
-        .map(item => item.trim())
-        .filter(Boolean)
-    : [];
 
   return {
     startUrl: typeof value.startUrl === "string" ? value.startUrl.trim() : "",
-    allowedOrigin: typeof value.allowedOrigin === "string" ? value.allowedOrigin.trim() : "",
+    allowedOrigin: typeof value.allowedOrigin === "string"
+      ? value.allowedOrigin.trim()
+      : "",
     allowedPathPrefix: normalizePathPrefix(value.allowedPathPrefix),
-    maxPages: clampInteger(value.maxPages, DEFAULT_SETTINGS.maxPages, ...LIMITS.maxPages),
-    maxDepth: clampInteger(value.maxDepth, DEFAULT_SETTINGS.maxDepth, ...LIMITS.maxDepth),
+    maxPages: clampInteger(
+      value.maxPages,
+      DEFAULT_SETTINGS.maxPages,
+      ...LIMITS.maxPages
+    ),
+    maxDepth: clampInteger(
+      value.maxDepth,
+      DEFAULT_SETTINGS.maxDepth,
+      ...LIMITS.maxDepth
+    ),
     requestDelayMs: clampInteger(
       value.requestDelayMs,
       DEFAULT_SETTINGS.requestDelayMs,
       ...LIMITS.requestDelayMs
     ),
-    retryLimit: clampInteger(value.retryLimit, DEFAULT_SETTINGS.retryLimit, ...LIMITS.retryLimit),
-    excludePatterns: [...new Set(excludePatterns)]
+    retryLimit: clampInteger(
+      value.retryLimit,
+      DEFAULT_SETTINGS.retryLimit,
+      ...LIMITS.retryLimit
+    ),
+    includePatterns: normalizePatterns(value.includePatterns),
+    excludePatterns: normalizePatterns(value.excludePatterns)
   };
 }
 
@@ -94,7 +117,9 @@ export function validateSettings(input) {
 export async function loadSettings(storageArea = chrome.storage.local) {
   try {
     const stored = await storageArea.get(STORAGE_KEYS.SETTINGS);
-    return success(normalizeSettings(stored[STORAGE_KEYS.SETTINGS] ?? DEFAULT_SETTINGS));
+    return success(
+      normalizeSettings(stored[STORAGE_KEYS.SETTINGS] ?? DEFAULT_SETTINGS)
+    );
   } catch (error) {
     return failure("SETTINGS_LOAD_FAILED", "Settings could not be loaded", true, {
       message: error instanceof Error ? error.message : String(error)
