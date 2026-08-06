@@ -18,10 +18,11 @@ The current goal is to complete the entire project directly rather than prepare 
 
 - Documentation foundation: **complete for the current approved scope (100%)**
 - M0 extension foundation: implemented
-- Pure-module M0 smoke tests: passing locally
+- M1 URL intelligence and safety: **implemented and pure-module verified**
+- Extension version: **0.2.0**
 - M0 Chrome browser acceptance: not yet recorded
-- Current functional product stage: early foundation, approximately 10%
-- Next implementation target: M1 URL intelligence and safety
+- Current functional product completion: **approximately 20%**
+- Next implementation target: **M2 Crawl Queue and State Machine**
 
 Documentation completion does not mean the working product is complete. Product progress is measured only from implemented and verified milestone capability.
 
@@ -46,9 +47,11 @@ The local agent plans the crawl, prioritizes pages, manages the queue, evaluates
 - Return source-backed extractive answers
 - Operate without npm packages, a backend, or a hosted AI API
 
-## Current M0 Foundation
+## Implemented Foundation
 
-The repository currently includes:
+The repository currently includes the M0 extension foundation and M1 URL safety engine.
+
+### M0
 
 ```text
 manifest.json
@@ -70,21 +73,38 @@ dashboard/dashboard.js
 tests/index.html
 tests/test-runner.js
 tests/assertions.js
-tests/unit/index.test.js
 ```
 
-M0 provides:
+### M1
 
-- Manifest V3 extension configuration
-- Background service-worker runtime
-- Typed runtime message foundation
-- Shared result and identifier helpers
-- Local settings validation and persistence
-- Popup configuration interface
-- Dashboard foundation
-- Scratch browser test harness
+```text
+src/crawler/query-policy.js
+src/crawler/url-resolver.js
+src/crawler/url-normalizer.js
+src/crawler/blocked-extensions.js
+src/crawler/link-safety.js
+src/crawler/scope-guard.js
+src/crawler/duplicate-url-registry.js
+src/crawler/url-intelligence.js
+tests/unit/index.test.js
+tests/unit/m1-edge.test.js
+```
 
-Crawling, extraction, export, indexing, and question answering are implemented in later milestones.
+M1 provides:
+
+- Relative and absolute HTTP/HTTPS URL resolution
+- Canonical URL normalization
+- Tracking-query removal and deterministic query sorting
+- Stable canonical keys
+- Exact origin and path-segment-aware scope checks
+- Include and exclude patterns
+- Downloadable-file blocking
+- Unsafe action-link detection
+- Page and depth limit decisions
+- Duplicate URL detection
+- Machine-readable reason codes and evidence
+
+The popup now saves include and exclude URL patterns locally. Crawling, fetching, extraction, export, indexing, and question answering are implemented in later milestones.
 
 ## Technology
 
@@ -110,14 +130,16 @@ No npm package, online AI API, server, or cloud database is required.
 6. Select the project directory.
 7. Pin Site Text Archiver to the toolbar.
 
-## M0 Usage
+## Current Usage
 
 1. Open any HTTP or HTTPS documentation page.
 2. Click the extension icon.
 3. Review or edit the detected start URL, origin, and path.
-4. Set page, depth, delay, and retry limits.
+4. Set page, depth, delay, retry, include, and exclude rules.
 5. Click **Save setup**.
 6. Open the dashboard to confirm runtime and saved configuration.
+
+The current release saves and validates setup and contains the complete M1 URL-decision engine. It does not yet start a real crawl; crawl scheduling begins in M2.
 
 ## Planned End-to-End Flow
 
@@ -149,6 +171,7 @@ The documentation set includes:
 - Requirements traceability matrix
 - UI and user-flow specification
 - M0 browser acceptance checklist
+- M1 implementation report
 - Scratch development standard
 - Solo implementation plan
 - Deferred security and privacy work
