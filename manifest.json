@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Site Text Archiver",
-  "version": "0.2.0",
-  "description": "Local-first documentation archiver with offline URL intelligence and safety.",
+  "version": "0.3.0",
+  "description": "Local-first documentation archiver with offline URL intelligence and a persisted crawl state machine.",
   "permissions": ["storage", "activeTab"],
   "action": {
     "default_title": "Site Text Archiver",
