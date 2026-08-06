@@ -15,5 +15,7 @@ button { border: 0; border-radius: 8px; padding: 10px 14px; background: AccentCo
 dl { display: grid; grid-template-columns: max-content 1fr; gap: 10px 20px; margin: 0; }
 dt { font-weight: 700; }
 dd { margin: 0; overflow-wrap: anywhere; }
+.event-list { margin: 0; padding-left: 22px; }
+.event-list li { padding: 5px 0; overflow-wrap: anywhere; }
 #status { min-height: 24px; }
 @media (max-width: 650px) { .cards { grid-template-columns: 1fr; } dl { grid-template-columns: 1fr; gap: 4px; } dd { margin-bottom: 10px; } }
