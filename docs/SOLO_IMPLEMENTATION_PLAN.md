@@ -88,7 +88,7 @@ Documentation foundation
 -> M9 dashboard and functional release
 ```
 
-The documentation foundation is complete for the current approved scope. Implementation remains at the M0 foundation stage.
+The documentation foundation is complete for the current approved scope. M0 and M1 are implemented; work now advances to M2.
 
 ## 6. Milestone Execution Loop
 
@@ -174,10 +174,10 @@ Current status:
 
 ```text
 Documentation: 100% for the current approved scope
-Implementation: M0 foundation committed
-Automated tests: M0 pure-module smoke tests reported passing locally
+Implementation: M0 foundation and M1 URL intelligence committed
+Automated tests: M0 smoke tests and M1 URL-decision tests implemented; core M1 pipeline verified locally
 Manual acceptance: M0 Chrome acceptance not yet recorded
-Overall functional product: approximately 10%, early foundation stage
+Overall functional product: approximately 20%
 ```
 
 A high documentation percentage must never be presented as a high product-completion percentage.
@@ -220,40 +220,30 @@ Permitted foundations include:
 
 ## 13. Current Implementation State
 
-M0 source implementation now includes:
+M0 provides the extension shell, shared contracts, settings persistence, popup, dashboard foundation, and scratch browser test harness.
+
+M1 provides:
 
 ```text
-manifest.json
-LICENSE
-src/background/service-worker.js
-src/messaging/message-types.js
-src/messaging/message-validator.js
-src/messaging/runtime-client.js
-src/shared/constants.js
-src/shared/result.js
-src/shared/id.js
-src/storage/settings-store.js
-popup/popup.html
-popup/popup.css
-popup/popup.js
-dashboard/dashboard.html
-dashboard/dashboard.css
-dashboard/dashboard.js
-tests/index.html
-tests/test-runner.js
-tests/assertions.js
-tests/unit/index.test.js
+src/crawler/query-policy.js
+src/crawler/url-resolver.js
+src/crawler/url-normalizer.js
+src/crawler/blocked-extensions.js
+src/crawler/link-safety.js
+src/crawler/scope-guard.js
+src/crawler/duplicate-url-registry.js
+src/crawler/url-intelligence.js
 ```
 
-The documentation control layer now includes:
+M1 integration also updates include/exclude settings, popup controls, runtime status, extension version, and URL test coverage.
+
+Milestone evidence is recorded in:
 
 ```text
-docs/DOCUMENTATION_INDEX.md
-docs/REQUIREMENTS_TRACEABILITY.md
-docs/M0_BROWSER_ACCEPTANCE_CHECKLIST.md
+docs/M1_IMPLEMENTATION_REPORT.md
 ```
 
-The next implementation target is **M1 — URL Intelligence and Safety**.
+The next implementation target is **M2 — Crawl Queue and State Machine**.
 
 ## 14. Completion Objective
 
