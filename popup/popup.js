@@ -10,6 +10,7 @@ const elements = {
   maxDepth: document.querySelector("#max-depth"),
   requestDelayMs: document.querySelector("#request-delay"),
   retryLimit: document.querySelector("#retry-limit"),
+  includePatterns: document.querySelector("#include-patterns"),
   excludePatterns: document.querySelector("#exclude-patterns"),
   status: document.querySelector("#status"),
   dashboardButton: document.querySelector("#dashboard-button")
@@ -18,6 +19,10 @@ const elements = {
 function setStatus(message, kind = "") {
   elements.status.textContent = message;
   elements.status.className = `status ${kind}`.trim();
+}
+
+function readPatternLines(element) {
+  return element.value.split("\n");
 }
 
 function readForm() {
@@ -29,7 +34,8 @@ function readForm() {
     maxDepth: Number(elements.maxDepth.value),
     requestDelayMs: Number(elements.requestDelayMs.value),
     retryLimit: Number(elements.retryLimit.value),
-    excludePatterns: elements.excludePatterns.value.split("\n")
+    includePatterns: readPatternLines(elements.includePatterns),
+    excludePatterns: readPatternLines(elements.excludePatterns)
   };
 }
 
@@ -41,21 +47,32 @@ function fillForm(settings) {
   elements.maxDepth.value = settings.maxDepth ?? 5;
   elements.requestDelayMs.value = settings.requestDelayMs ?? 500;
   elements.retryLimit.value = settings.retryLimit ?? 2;
+  elements.includePatterns.value = (settings.includePatterns ?? []).join("\n");
   elements.excludePatterns.value = (settings.excludePatterns ?? []).join("\n");
 }
 
 async function detectActiveTab() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (!tab?.url) return;
+  if (!tab?.url) {
+    return;
+  }
 
   try {
     const url = new URL(tab.url);
-    if (!["http:", "https:"].includes(url.protocol)) return;
-    if (!elements.startUrl.value) elements.startUrl.value = url.href;
-    if (!elements.allowedOrigin.value) elements.allowedOrigin.value = url.origin;
+    if (!["http:", "https:"].includes(url.protocol)) {
+      return;
+    }
+    if (!elements.startUrl.value) {
+      elements.startUrl.value = url.href;
+    }
+    if (!elements.allowedOrigin.value) {
+      elements.allowedOrigin.value = url.origin;
+    }
     if (elements.allowedPathPrefix.value === "/") {
       const parts = url.pathname.split("/").filter(Boolean);
-      elements.allowedPathPrefix.value = parts.length > 1 ? `/${parts.slice(0, -1).join("/")}` : "/";
+      elements.allowedPathPrefix.value = parts.length > 1
+        ? `/${parts.slice(0, -1).join("/")}`
+        : "/";
     }
   } catch {
     // Unsupported active-tab URL; keep saved values.
@@ -73,7 +90,9 @@ async function initialize() {
     return;
   }
 
-  if (settingsResult.ok) fillForm(settingsResult.value);
+  if (settingsResult.ok) {
+    fillForm(settingsResult.value);
+  }
   await detectActiveTab();
   setStatus(`Ready — ${ping.value.version}`, "success");
 }
@@ -81,14 +100,23 @@ async function initialize() {
 elements.form.addEventListener("submit", async event => {
   event.preventDefault();
   setStatus("Saving…");
-  const result = await sendRuntimeMessage(MESSAGE_TYPES.SAVE_SETTINGS, { settings: readForm() });
-  setStatus(result.ok ? "Setup saved locally." : result.error.message, result.ok ? "success" : "error");
-  if (result.ok) fillForm(result.value);
+  const result = await sendRuntimeMessage(MESSAGE_TYPES.SAVE_SETTINGS, {
+    settings: readForm()
+  });
+  setStatus(
+    result.ok ? "Setup saved locally." : result.error.message,
+    result.ok ? "success" : "error"
+  );
+  if (result.ok) {
+    fillForm(result.value);
+  }
 });
 
 elements.dashboardButton.addEventListener("click", async () => {
   const result = await sendRuntimeMessage(MESSAGE_TYPES.OPEN_DASHBOARD);
-  if (!result.ok) setStatus(result.error.message, "error");
+  if (!result.ok) {
+    setStatus(result.error.message, "error");
+  }
 });
 
 void initialize();
