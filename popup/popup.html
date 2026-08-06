@@ -10,7 +10,7 @@
   <main class="app-shell">
     <header>
       <h1>Site Text Archiver</h1>
-      <p class="subtitle">M1 URL intelligence and safety</p>
+      <p class="subtitle">M2 crawl queue and state machine</p>
     </header>
 
     <form id="settings-form" novalidate>
@@ -25,11 +25,23 @@
         <label>Retries<input id="retry-limit" name="retryLimit" type="number" min="0" max="10"></label>
       </div>
 
-      <label>Include patterns<textarea id="include-patterns" name="includePatterns" rows="3" placeholder="Optional; one pattern per line"></textarea></label>
-      <label>Exclude patterns<textarea id="exclude-patterns" name="excludePatterns" rows="3" placeholder="One pattern per line"></textarea></label>
+      <label>Include patterns<textarea id="include-patterns" name="includePatterns" rows="2" placeholder="Optional; one pattern per line"></textarea></label>
+      <label>Exclude patterns<textarea id="exclude-patterns" name="excludePatterns" rows="2" placeholder="One pattern per line"></textarea></label>
 
       <button id="save-button" type="submit">Save setup</button>
     </form>
+
+    <section class="crawl-panel" aria-labelledby="crawl-heading">
+      <h2 id="crawl-heading">Crawl control</h2>
+      <p id="crawl-summary">No active crawl.</p>
+      <div class="control-grid">
+        <button id="create-button" type="button">Create</button>
+        <button id="start-button" type="button">Start</button>
+        <button id="pause-button" type="button">Pause</button>
+        <button id="resume-button" type="button">Resume</button>
+        <button id="cancel-button" type="button">Cancel</button>
+      </div>
+    </section>
 
     <p id="status" class="status" role="status" aria-live="polite">Connecting…</p>
     <button id="dashboard-button" class="secondary" type="button">Open dashboard</button>
