@@ -23,13 +23,15 @@ A milestone is complete only when:
 
 Progress percentages represent working product capability, not documentation volume.
 
+The documentation foundation is complete for the current approved scope. `DOCUMENTATION_INDEX.md` defines document authority and reading order, while `REQUIREMENTS_TRACEABILITY.md` maps capabilities to implementation and verification evidence.
+
 ---
 
 ## M0 — Project Foundation
 
 ### Status
 
-**Implemented in source. Browser installation acceptance remains to be manually confirmed.**
+**Implemented in source. Browser installation acceptance remains to be manually confirmed using `M0_BROWSER_ACCEPTANCE_CHECKLIST.md`.**
 
 ### Goal
 
@@ -63,6 +65,7 @@ Create an installable Chrome Manifest V3 extension skeleton and the shared found
 - Confirm popup opens without console errors.
 - Confirm dashboard opens.
 - Confirm settings persist after browser restart.
+- Record results in `M0_BROWSER_ACCEPTANCE_CHECKLIST.md`.
 
 ### Estimated Product Completion
 
