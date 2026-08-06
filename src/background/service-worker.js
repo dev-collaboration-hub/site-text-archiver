@@ -10,7 +10,11 @@ async function handleMessage(message) {
       return success({ appName: APP_NAME, version: APP_VERSION, alive: true });
 
     case MESSAGE_TYPES.GET_STATUS:
-      return success({ state: CRAWL_STATES.IDLE, milestone: "M0", version: APP_VERSION });
+      return success({
+        state: CRAWL_STATES.IDLE,
+        milestone: "M1",
+        version: APP_VERSION
+      });
 
     case MESSAGE_TYPES.GET_SETTINGS:
       return loadSettings();
@@ -19,7 +23,9 @@ async function handleMessage(message) {
       return saveSettings(message.payload.settings);
 
     case MESSAGE_TYPES.OPEN_DASHBOARD:
-      await chrome.tabs.create({ url: chrome.runtime.getURL("dashboard/dashboard.html") });
+      await chrome.tabs.create({
+        url: chrome.runtime.getURL("dashboard/dashboard.html")
+      });
       return success({ opened: true });
 
     default:
