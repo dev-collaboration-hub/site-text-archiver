@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Site Text Archiver",
-  "version": "0.1.0",
-  "description": "Local-first documentation archiver foundation.",
+  "version": "0.2.0",
+  "description": "Local-first documentation archiver with offline URL intelligence and safety.",
   "permissions": ["storage", "activeTab"],
   "action": {
     "default_title": "Site Text Archiver",
