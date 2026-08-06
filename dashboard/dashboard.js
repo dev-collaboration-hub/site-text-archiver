@@ -1,16 +1,33 @@
 import { MESSAGE_TYPES } from "../src/messaging/message-types.js";
 import { sendRuntimeMessage } from "../src/messaging/runtime-client.js";
 
-const milestone = document.querySelector("#milestone");
-const runtimeState = document.querySelector("#runtime-state");
-const version = document.querySelector("#version");
-const settingsList = document.querySelector("#settings-list");
-const status = document.querySelector("#status");
-const refreshButton = document.querySelector("#refresh-button");
+const elements = {
+  milestone: document.querySelector("#milestone"),
+  runtimeState: document.querySelector("#runtime-state"),
+  version: document.querySelector("#version"),
+  queuedCount: document.querySelector("#queued-count"),
+  completedCount: document.querySelector("#completed-count"),
+  failedCount: document.querySelector("#failed-count"),
+  crawlList: document.querySelector("#crawl-list"),
+  eventList: document.querySelector("#event-list"),
+  settingsList: document.querySelector("#settings-list"),
+  status: document.querySelector("#status"),
+  refreshButton: document.querySelector("#refresh-button")
+};
+
+function renderDefinitionList(element, entries) {
+  element.replaceChildren();
+  for (const [label, value] of entries) {
+    const term = document.createElement("dt");
+    const description = document.createElement("dd");
+    term.textContent = label;
+    description.textContent = String(value);
+    element.append(term, description);
+  }
+}
 
 function renderSettings(settings) {
-  settingsList.replaceChildren();
-  const entries = [
+  renderDefinitionList(elements.settingsList, [
     ["Start URL", settings.startUrl || "Not set"],
     ["Allowed origin", settings.allowedOrigin || "Not set"],
     ["Allowed path", settings.allowedPathPrefix],
@@ -18,36 +35,75 @@ function renderSettings(settings) {
     ["Max depth", settings.maxDepth],
     ["Request delay", `${settings.requestDelayMs} ms`],
     ["Retry limit", settings.retryLimit]
-  ];
+  ]);
+}
 
-  for (const [label, value] of entries) {
-    const term = document.createElement("dt");
-    const description = document.createElement("dd");
-    term.textContent = label;
-    description.textContent = String(value);
-    settingsList.append(term, description);
+function renderCrawl(summary) {
+  const counts = summary?.counts ?? {};
+  elements.queuedCount.textContent = String(counts.queued ?? 0);
+  elements.completedCount.textContent = String(counts.completed ?? 0);
+  elements.failedCount.textContent = String(counts.failed ?? 0);
+  renderDefinitionList(elements.crawlList, summary ? [
+    ["Crawl ID", summary.crawlId],
+    ["Lifecycle", summary.lifecycle],
+    ["State version", summary.stateVersion],
+    ["Start URL", summary.startUrl],
+    ["Discovered", counts.discovered ?? 0],
+    ["Queued", counts.queued ?? 0],
+    ["Fetching", counts.fetching ?? 0],
+    ["Completed", counts.completed ?? 0],
+    ["Skipped", counts.skipped ?? 0],
+    ["Failed", counts.failed ?? 0]
+  ] : [["Status", "No active crawl"]]);
+}
+
+function renderEvents(events) {
+  elements.eventList.replaceChildren();
+  for (const event of events) {
+    const item = document.createElement("li");
+    item.textContent = `#${event.sequence} ${event.type} — ${event.payload.lifecycle}`;
+    elements.eventList.append(item);
+  }
+  if (events.length === 0) {
+    const item = document.createElement("li");
+    item.textContent = "No events recorded.";
+    elements.eventList.append(item);
   }
 }
 
 async function refresh() {
-  status.textContent = "Loading…";
+  elements.status.textContent = "Loading…";
   const [statusResult, settingsResult] = await Promise.all([
     sendRuntimeMessage(MESSAGE_TYPES.GET_STATUS),
     sendRuntimeMessage(MESSAGE_TYPES.GET_SETTINGS)
   ]);
-
   if (!statusResult.ok) {
-    status.textContent = statusResult.error.message;
+    elements.status.textContent = statusResult.error.message;
     return;
   }
 
-  milestone.textContent = statusResult.value.milestone;
-  runtimeState.textContent = statusResult.value.state;
-  version.textContent = statusResult.value.version;
-
+  elements.milestone.textContent = statusResult.value.milestone;
+  elements.runtimeState.textContent = statusResult.value.state;
+  elements.version.textContent = statusResult.value.version;
+  renderCrawl(statusResult.value.activeCrawl);
   if (settingsResult.ok) renderSettings(settingsResult.value);
-  status.textContent = "Foundation connected.";
+
+  const crawlId = statusResult.value.activeCrawl?.crawlId;
+  if (crawlId) {
+    const eventsResult = await sendRuntimeMessage(MESSAGE_TYPES.GET_AGENT_EVENTS, {
+      crawlId,
+      offset: 0,
+      limit: 50
+    });
+    renderEvents(eventsResult.ok ? eventsResult.value.items : []);
+  } else {
+    renderEvents([]);
+  }
+  elements.status.textContent = "M2 runtime connected.";
 }
 
-refreshButton.addEventListener("click", () => void refresh());
+elements.refreshButton.addEventListener("click", () => void refresh());
+chrome.runtime.onMessage.addListener(event => {
+  if (event?.eventId) void refresh();
+});
 void refresh();
