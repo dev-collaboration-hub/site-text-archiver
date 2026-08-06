@@ -16,11 +16,14 @@ The current goal is to complete the entire project directly rather than prepare 
 
 ## Current Status
 
-- Documentation foundation: approximately 97%
+- Documentation foundation: **complete for the current approved scope (100%)**
 - M0 extension foundation: implemented
 - Pure-module M0 smoke tests: passing locally
-- Current functional product stage: early foundation
-- Next target: M1 URL intelligence and safety
+- M0 Chrome browser acceptance: not yet recorded
+- Current functional product stage: early foundation, approximately 10%
+- Next implementation target: M1 URL intelligence and safety
+
+Documentation completion does not mean the working product is complete. Product progress is measured only from implemented and verified milestone capability.
 
 ## Project Goal
 
@@ -132,7 +135,9 @@ Open documentation page
 
 ## Documentation
 
-Detailed specifications are available under `docs/`, including:
+Start with `docs/DOCUMENTATION_INDEX.md`, which defines the reading order and source-of-truth rules.
+
+The documentation set includes:
 
 - Project specification
 - Architecture
@@ -141,10 +146,14 @@ Detailed specifications are available under `docs/`, including:
 - Algorithms and pseudocode
 - API, message, and data contracts
 - Testing strategy
+- Requirements traceability matrix
 - UI and user-flow specification
+- M0 browser acceptance checklist
 - Scratch development standard
 - Solo implementation plan
 - Deferred security and privacy work
+
+The documentation foundation is complete for the currently approved scope, but it must remain synchronized as implementation progresses.
 
 ## License
 
