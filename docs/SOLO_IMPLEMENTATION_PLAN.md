@@ -2,77 +2,28 @@
 
 ## 1. Purpose
 
-This document defines how Site Text Archiver will be completed without a contributor workflow.
-
-The project uses a single-owner execution model:
+This document defines how Site Text Archiver is completed through a single-owner, milestone-by-milestone workflow.
 
 - **Product direction:** Dilip Singh
 - **Implementation execution:** ChatGPT
 - **Repository:** `dev-collaboration-hub/site-text-archiver`
 - **Primary branch:** `main`
-- **Build style:** scratch-built, milestone-by-milestone
+- **Build style:** scratch-built with browser-native capabilities
 
-ChatGPT is responsible for converting the approved documentation into working source code, tests, fixes, progress updates, and release artifacts.
-
-## 2. What This Replaces
-
-The current project does not require:
-
-- Contributor onboarding
-- Contribution guides
-- Task assignment among developers
-- Pull-request coordination between contributors
-- External implementation ownership
-- Contributor milestone allocation
-- Waiting for volunteers
-
-Issues or branches may still be used later when technically helpful, but they are not required to coordinate people.
-
-## 3. Execution Responsibilities
-
-### 3.1 Dilip Singh
-
-Dilip Singh provides:
-
-- Product vision
-- Priority decisions
-- Scope changes
-- Feature acceptance or rejection
-- Final direction when multiple product choices exist
-
-### 3.2 ChatGPT
-
-ChatGPT performs:
-
-- Repository inspection
-- Architecture refinement
-- Documentation maintenance
-- File and folder creation
-- JavaScript, HTML, and CSS implementation
-- Algorithm implementation
-- Test-harness implementation
-- Test fixture creation
-- Debugging and correction
-- Milestone verification
-- Honest progress estimation
-- README and release-document updates
-
-## 4. Working Rules
+## 2. Working Rules
 
 1. Implement one milestone at a time.
 2. Do not count documentation as working product code.
-3. Do not mark placeholder files complete.
+3. Do not mark placeholder behavior complete.
 4. Keep core algorithms independent of Chrome APIs where practical.
-5. Build without npm dependencies.
-6. Use only browser-native and Chrome Extension APIs.
-7. Store important runtime state because Manifest V3 workers can stop.
-8. Add tests with each functional module.
-9. Fix failures before claiming milestone completion.
-10. Keep documentation synchronized with real behavior.
-11. Report limitations honestly.
-12. Avoid unnecessary architecture expansion before the basic crawler works.
+5. Use no npm packages or external JavaScript libraries.
+6. Persist important runtime state because Manifest V3 workers may stop.
+7. Add tests with every functional module.
+8. Fix failures before claiming milestone completion.
+9. Keep documentation synchronized with real behavior.
+10. Report browser-verification limitations honestly.
 
-## 5. Main Implementation Sequence
+## 3. Implementation Sequence
 
 ```text
 Documentation foundation
@@ -88,114 +39,57 @@ Documentation foundation
 -> M9 dashboard and functional release
 ```
 
-The documentation foundation is complete for the current approved scope. M0 and M1 are implemented; work now advances to M2.
-
-## 6. Milestone Execution Loop
-
-For each milestone, ChatGPT follows this loop:
+## 4. Milestone Execution Loop
 
 ```text
-Inspect current repository
--> compare implementation with specification
--> identify exact missing files
--> implement smallest complete slice
--> add or update tests
+Inspect repository
+-> compare source with contracts
+-> implement the smallest complete slice
+-> add tests
 -> run available verification
--> inspect failures
 -> fix failures
--> update documentation and progress
--> proceed to next slice
+-> update evidence and progress
+-> advance to the next milestone
 ```
 
-## 7. Definition of Done
+## 5. Definition of Done
 
 A module is complete only when:
 
-- Its intended files exist.
-- Public functions match the documented contracts.
+- Its intended source exists.
+- Public functions match documented contracts.
 - Main behavior works.
-- Invalid input is handled.
-- Expected errors use reason codes.
-- Relevant tests exist.
-- Tests pass or unresolved failures are clearly disclosed.
+- Invalid input is handled with reason codes.
+- Relevant tests exist and pass in the available environment.
+- Remaining manual browser checks are clearly disclosed.
 - No unfinished placeholder is presented as complete.
 
-A milestone is complete only when all of its required modules satisfy this definition.
+## 6. Repository Write Policy
 
-## 8. Repository Write Policy
-
-Current default workflow:
-
-- Work directly against the repository's `main` branch.
+- Work directly on `main` for the current single-owner workflow.
+- Fetch an existing file before replacing it.
 - Use clear, scoped commit messages.
-- Avoid unrelated file changes in one implementation step.
-- Fetch the current file before replacing an existing file.
-- Verify newly created or updated files after repository writes.
-- Preserve stable documentation paths and contracts.
+- Keep unrelated changes separate.
+- Verify updated files after writes.
+- Preserve stable documentation and contract paths.
 
-A temporary branch may be used for a risky large change, but contributor review is not assumed.
+## 7. Testing Policy
 
-## 9. Testing Policy
+The maintained verification layers include:
 
-Testing is part of implementation, not a separate contributor task.
-
-ChatGPT must build and maintain:
-
-- Scratch JavaScript test harness
+- Scratch JavaScript browser test harness
 - Pure unit tests
 - Module contract tests
-- IndexedDB integration tests
-- Pipeline fixtures
-- Local crawl-site fixtures
-- Golden Markdown and JSON outputs
+- Mocked persistence tests
+- Service-worker restart-recovery tests
+- Future IndexedDB integration tests
+- Future local crawl-site fixtures
+- Future golden Markdown and JSON outputs
 - Manual Chrome extension acceptance instructions
 
-The current functional test scope is defined in `docs/TESTING_STRATEGY.md`.
+M0 manual verification is tracked in `M0_BROWSER_ACCEPTANCE_CHECKLIST.md`.
 
-M0 manual Chrome verification is defined in `docs/M0_BROWSER_ACCEPTANCE_CHECKLIST.md`.
-
-Requirement-to-implementation and requirement-to-test mapping is maintained in `docs/REQUIREMENTS_TRACEABILITY.md`.
-
-Security and privacy hardening remain deferred in `docs/DEFERRED_SECURITY_PRIVACY_WORK.md`.
-
-## 10. Progress Reporting
-
-Progress must distinguish:
-
-```text
-Documentation progress
-Implementation progress
-Automated test progress
-Manual acceptance progress
-Overall functional product progress
-```
-
-Current status:
-
-```text
-Documentation: 100% for the current approved scope
-Implementation: M0 foundation and M1 URL intelligence committed
-Automated tests: M0 smoke tests and M1 URL-decision tests implemented; core M1 pipeline verified locally
-Manual acceptance: M0 Chrome acceptance not yet recorded
-Overall functional product: approximately 20%
-```
-
-A high documentation percentage must never be presented as a high product-completion percentage.
-
-## 11. Decision Handling
-
-When a small technical choice is needed, ChatGPT should choose the option that is:
-
-1. Simpler
-2. Deterministic
-3. Easier to test
-4. Lower in memory and CPU cost
-5. Compatible with Manifest V3 lifecycle constraints
-6. Consistent with scratch-built development
-
-Only major product-direction changes need to be raised to Dilip Singh.
-
-## 12. No External Dependency Rule
+## 8. No External Dependency Rule
 
 The implementation must not depend on:
 
@@ -207,47 +101,63 @@ The implementation must not depend on:
 - Cloud databases
 - Remote analytics
 
-Permitted foundations include:
+Permitted foundations include standard JavaScript, URL and Fetch APIs, DOMParser, IndexedDB, Web Workers, Chrome Extension APIs, and browser-native Web Crypto.
 
-- Standard JavaScript
-- DOMParser
-- URL API
-- Fetch API
-- IndexedDB
-- Web Workers
-- Chrome Extension APIs
-- Browser-native Web Crypto
+## 9. Current Implementation State
 
-## 13. Current Implementation State
+### M0 — Extension foundation
 
-M0 provides the extension shell, shared contracts, settings persistence, popup, dashboard foundation, and scratch browser test harness.
+Implemented. Chrome load-unpacked and manual persistence acceptance remain to be recorded.
 
-M1 provides:
+### M1 — URL intelligence and safety
 
-```text
-src/crawler/query-policy.js
-src/crawler/url-resolver.js
-src/crawler/url-normalizer.js
-src/crawler/blocked-extensions.js
-src/crawler/link-safety.js
-src/crawler/scope-guard.js
-src/crawler/duplicate-url-registry.js
-src/crawler/url-intelligence.js
-```
+Implemented and locally verified. Evidence: `M1_IMPLEMENTATION_REPORT.md`.
 
-M1 integration also updates include/exclude settings, popup controls, runtime status, extension version, and URL test coverage.
+### M2 — Crawl queue and state machine
 
-Milestone evidence is recorded in:
+Implemented and locally verified.
+
+Primary M2 source:
 
 ```text
-docs/M1_IMPLEMENTATION_REPORT.md
+src/crawler/crawl-config.js
+src/crawler/crawl-run.js
+src/crawler/crawl-state.js
+src/crawler/state-transition.js
+src/crawler/task-record.js
+src/crawler/priority-task-queue.js
+src/crawler/progress-events.js
+src/messaging/request-cache.js
+src/messaging/event-publisher.js
+src/storage/crawl-store.js
+src/background/runtime-controller.js
 ```
 
-The next implementation target is **M2 — Crawl Queue and State Machine**.
+Verification:
 
-## 14. Completion Objective
+```text
+tests/unit/m2.test.js
+tests/unit/m2-recovery.test.js
+```
 
-The final objective is not to create work for contributors. The objective is to leave the repository with a functioning Chrome extension that can:
+M2 provides deterministic scheduling, persisted lifecycle controls, idempotent commands, progress statistics, and service-worker restart repair. It does not fetch pages; that begins in M3.
+
+Evidence: `M2_IMPLEMENTATION_REPORT.md`.
+
+## 10. Current Progress
+
+```text
+Documentation: 100% for the current approved scope
+M0: implemented; manual Chrome acceptance pending
+M1: implemented and locally verified
+M2: implemented and locally verified
+Overall functional product: approximately 32%
+Next target: M3 Page Fetching and Link Discovery
+```
+
+## 11. Completion Objective
+
+The final extension must:
 
 - Crawl bounded documentation sites
 - Extract structured content
