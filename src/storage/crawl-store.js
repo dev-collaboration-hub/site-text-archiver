@@ -33,6 +33,8 @@ export function validateCrawlSnapshot(snapshot) {
   }
   return success({
     ...snapshot,
+    fetchRecords: Array.isArray(snapshot.fetchRecords) ? snapshot.fetchRecords.map(item => ({ ...item })) : [],
+    pageSummaries: Array.isArray(snapshot.pageSummaries) ? snapshot.pageSummaries.map(item => ({ ...item })) : [],
     events: Array.isArray(snapshot.events) ? snapshot.events.map(event => ({ ...event })) : [],
     requestCache: Array.isArray(snapshot.requestCache) ? snapshot.requestCache.map(item => ({ ...item })) : []
   });
@@ -83,9 +85,14 @@ export function repairInterruptedSnapshot(snapshot, now = Date.now()) {
 
   if (next.run.activeTaskId) {
     const active = queue.get(next.run.activeTaskId);
-    if (active && active.state === TASK_STATES.FETCHING) {
+    if (active?.state === TASK_STATES.FETCHING) {
       const repaired = queue.markState(active.taskId, TASK_STATES.QUEUED, {
         availableAt: now,
+        reasonCode: "RUNTIME_RESTORED"
+      }, now);
+      if (!repaired.ok) return repaired;
+    } else if (active?.state === TASK_STATES.EXTRACTING) {
+      const repaired = queue.markState(active.taskId, TASK_STATES.FETCHED, {
         reasonCode: "RUNTIME_RESTORED"
       }, now);
       if (!repaired.ok) return repaired;
