@@ -1,0 +1,20 @@
+name: M5 Verification
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-m5:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify M5 deterministic archive export
+        run: node --experimental-default-type=module tests/node/m5-verify.mjs
