@@ -7,9 +7,14 @@ import { publishProgressEvent } from "../messaging/event-publisher.js";
 import { clearCrawlTick, CRAWL_TICK_ALARM, scheduleCrawlTick } from "./alarm-adapter.js";
 import { createRuntimeController } from "./runtime-controller.js";
 
+let activeFetchAbortController = null;
+
 const runtimeController = createRuntimeController({
   storageArea: chrome.storage.local,
-  publishEvent: publishProgressEvent
+  publishEvent: publishProgressEvent,
+  fetchDependencies: {
+    externalSignalProvider: () => activeFetchAbortController?.signal ?? null
+  }
 });
 
 let serialChain = Promise.resolve();
@@ -21,17 +26,22 @@ function serial(operation) {
 }
 
 async function processCrawlerTick() {
-  const processed = await runtimeController.processNextTask();
-  if (!processed.ok) {
-    console.warn("Site Text Archiver M3 crawl tick failed", processed.error);
+  activeFetchAbortController = new AbortController();
+  try {
+    const processed = await runtimeController.processNextTask();
+    if (!processed.ok) {
+      console.warn("Site Text Archiver M3 crawl tick failed", processed.error);
+      return processed;
+    }
+    if (processed.value.shouldContinue) {
+      await scheduleCrawlTick(processed.value.nextDelayMs ?? 0);
+    } else {
+      await clearCrawlTick();
+    }
     return processed;
+  } finally {
+    activeFetchAbortController = null;
   }
-  if (processed.value.shouldContinue) {
-    await scheduleCrawlTick(processed.value.nextDelayMs ?? 0);
-  } else {
-    await clearCrawlTick();
-  }
-  return processed;
 }
 
 async function handleMessage(message) {
@@ -129,6 +139,10 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (!validated.ok) {
     sendResponse(validated);
     return false;
+  }
+
+  if ([MESSAGE_TYPES.CRAWL_PAUSE, MESSAGE_TYPES.CRAWL_CANCEL].includes(validated.value.type)) {
+    activeFetchAbortController?.abort();
   }
 
   void serial(() => handleMessage(validated.value))
