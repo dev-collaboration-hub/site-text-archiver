@@ -18,12 +18,13 @@ This project uses a **single-owner implementation workflow**.
 - M1 URL intelligence and safety: implemented and verified
 - M2 crawl queue and state machine: implemented and verified
 - M3 page fetching and link discovery: implemented and verified
-- M4 semantic content extraction: **implemented and verified**
-- Extension version: **0.5.0**
-- GitHub Actions M4 verification: **passing**
+- M4 semantic content extraction: implemented and verified
+- M5 Markdown and JSON archive generation: **implemented and verified**
+- Extension version: **0.6.0**
+- GitHub Actions M4/M5 verification: **passing for implementation verification commits**
 - Chrome load-unpacked/manual acceptance: not yet recorded
-- Current functional product completion: **approximately 58%**
-- Next implementation target: **M5 Markdown and JSON Archive Generation**
+- Current functional product completion: **approximately 68%**
+- Next implementation target: **M6 Offline Agent Controller and Quality System**
 
 Product progress is measured from implemented milestone capability, not documentation volume.
 
@@ -75,45 +76,56 @@ The agent is deterministic and fully offline. It is not a hosted LLM or external
 
 ### M4 — Semantic Content Extraction
 
+- Scratch-built inert HTML AST parser
+- Hidden/executable markup cleanup
+- Evidence-based main-content detection
+- Headings, paragraphs, links, lists, tables, code blocks, blockquotes, and callouts
+- Page metadata and canonical URL extraction
+- Browser-native SHA-256 content/structure hashes
+- IndexedDB PageRecord persistence
+- Restart-safe `FETCHED -> EXTRACTING -> EXTRACTED` flow
+
+### M5 — Markdown and JSON Archive Generation
+
 ```text
-src/extraction/dom-utils.js
-src/extraction/html-parser.js
-src/extraction/dom-cleaner.js
-src/extraction/main-content-detector.js
-src/extraction/content-extractor.js
-src/extraction/page-record.js
-src/extraction/extraction-pipeline.js
-src/crawler/extraction-runner.js
-src/storage/page-record-store.js
+src/export/markdown-escape.js
+src/export/code-fence.js
+src/export/table-renderer.js
+src/export/markdown-converter.js
+src/export/page-ordering.js
+src/export/toc-builder.js
+src/export/report-generator.js
+src/export/archive-builder.js
+src/export/file-names.js
+src/export/download-adapter.js
 ```
 
-M4 provides:
+M5 provides:
 
-- Scratch-built inert HTML AST parser
-- Script/style/template/iframe/form-control and hidden-node removal
-- Evidence-backed main-content scoring with body fallback
-- Heading hierarchy and heading-path preservation
-- Paragraphs with inline code and links
-- Ordered/unordered nested lists
-- Tables with simple `rowspan`/`colspan` normalization and warnings
-- Code blocks with whitespace and language-hint preservation
-- Blockquotes, callouts, horizontal rules, and useful image alt text
-- Title, description, author, language, and canonical metadata
-- Deterministic plain text and preliminary Markdown derivation
-- SHA-256 content and structure hashes using browser-native Web Crypto
-- PageRecords persisted separately in IndexedDB
-- `FETCHED -> EXTRACTING -> EXTRACTED` persisted task flow
-- Raw fetched HTML cleanup after successful PageRecord storage
-- Extraction restart recovery after service-worker suspension
-- Dashboard extracted-page summaries and extraction events
+- Stable PageRecord ordering
+- Final semantic-block-to-Markdown rendering
+- Combined-document heading normalization
+- Unique duplicate-title TOC anchors
+- Source URL blocks for every page
+- Safe code fences for embedded backticks
+- Markdown-table escaping
+- Combined `documentation.md`
+- Byte-stable structured `documentation.json`
+- `crawl-report.json`
+- Conditional `failed-pages.json`
+- Terminal-snapshot export safety
+- `EMPTY_ARCHIVE` protection
+- Browser-native `chrome.downloads` integration
+- Download filename/path sanitization
+- Dashboard archive download control
 
-Cross-page boilerplate scoring, duplicate-content analysis, and quality scoring remain intentionally in M6.
+Cross-page boilerplate scoring, duplicate-content analysis, quality scoring, and recovery decisions remain intentionally in M6.
 
 ## Current Runtime Boundary
 
-The extension can now crawl approved documentation pages **and convert fetched HTML into structured semantic PageRecords**.
+The extension can now crawl approved documentation pages, convert fetched HTML into semantic PageRecords, and export a terminal crawl as deterministic Markdown/JSON/report files.
 
-M5 will turn those PageRecords into deterministic combined Markdown, structured JSON, crawl reports, failed-page reports, and browser downloads.
+M6 will add the offline agent's cross-page quality, duplicate/boilerplate analysis, explainable decisions, and bounded recovery behavior.
 
 ## Technology
 
@@ -147,7 +159,8 @@ No npm package, external JavaScript library, hosted AI model, online LLM API, ba
 5. Click **Start**.
 6. The extension fetches approved pages, discovers links, and automatically extracts semantic content.
 7. Use **Pause**, **Resume**, or **Cancel** when needed.
-8. Open the dashboard to inspect queue, fetch, extraction, failure, and event state.
+8. Open the dashboard after a terminal crawl.
+9. Click **Download archive files** to generate and download Markdown, JSON, crawl report, and any applicable failed-page report.
 
 ## Documentation
 
@@ -159,6 +172,7 @@ Implementation evidence:
 - `docs/M2_IMPLEMENTATION_REPORT.md`
 - `docs/M3_IMPLEMENTATION_REPORT.md`
 - `docs/M4_IMPLEMENTATION_REPORT.md`
+- `docs/M5_IMPLEMENTATION_REPORT.md`
 - `docs/REQUIREMENTS_TRACEABILITY.md`
 - `docs/M0_BROWSER_ACCEPTANCE_CHECKLIST.md`
 
