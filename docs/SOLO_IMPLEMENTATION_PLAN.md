@@ -75,19 +75,20 @@ A module is complete only when:
 
 ## 7. Testing Policy
 
-The maintained verification layers include:
+Maintained verification layers include:
 
 - Scratch JavaScript browser test harness
 - Pure unit tests
 - Module contract tests
-- Mocked persistence tests
+- Mocked persistence/runtime tests
 - Service-worker restart-recovery tests
-- Future IndexedDB integration tests
+- Dependency-free Node verification in GitHub Actions
+- IndexedDB-backed runtime implementation with manual Chrome acceptance still pending
 - Future local crawl-site fixtures
-- Future golden Markdown and JSON outputs
+- Future golden archive outputs
 - Manual Chrome extension acceptance instructions
 
-M0 manual verification is tracked in `M0_BROWSER_ACCEPTANCE_CHECKLIST.md`.
+M0 manual verification remains tracked in `M0_BROWSER_ACCEPTANCE_CHECKLIST.md`.
 
 ## 8. No External Dependency Rule
 
@@ -101,7 +102,7 @@ The implementation must not depend on:
 - Cloud databases
 - Remote analytics
 
-Permitted foundations include standard JavaScript, URL and Fetch APIs, DOMParser, IndexedDB, Web Workers, Chrome Extension APIs, and browser-native Web Crypto.
+Permitted foundations include standard JavaScript, URL and Fetch APIs, IndexedDB, Web Workers, Chrome Extension APIs, and browser-native Web Crypto. M4 uses a scratch-built inert HTML AST parser rather than a third-party HTML parsing library.
 
 ## 9. Current Implementation State
 
@@ -111,48 +112,59 @@ Implemented. Chrome load-unpacked and manual persistence acceptance remain to be
 
 ### M1 — URL intelligence and safety
 
-Implemented and locally verified. Evidence: `M1_IMPLEMENTATION_REPORT.md`.
+Implemented and verified. Evidence: `M1_IMPLEMENTATION_REPORT.md`.
 
 ### M2 — Crawl queue and state machine
 
-Implemented and locally verified.
+Implemented and verified. Evidence: `M2_IMPLEMENTATION_REPORT.md`.
 
-Primary M2 source:
+### M3 — Page fetching and link discovery
+
+Implemented and verified. The extension can perform bounded HTML fetching, classify retry/permanent failures, discover connected links, revalidate them through M1, persist crawl state, and store fetched HTML for extraction.
+
+Evidence: `M3_IMPLEMENTATION_REPORT.md`.
+
+### M4 — Semantic content extraction
+
+Implemented and verified.
+
+Primary source:
 
 ```text
-src/crawler/crawl-config.js
-src/crawler/crawl-run.js
-src/crawler/crawl-state.js
-src/crawler/state-transition.js
-src/crawler/task-record.js
-src/crawler/priority-task-queue.js
-src/crawler/progress-events.js
-src/messaging/request-cache.js
-src/messaging/event-publisher.js
-src/storage/crawl-store.js
-src/background/runtime-controller.js
+src/extraction/dom-utils.js
+src/extraction/html-parser.js
+src/extraction/dom-cleaner.js
+src/extraction/main-content-detector.js
+src/extraction/content-extractor.js
+src/extraction/page-record.js
+src/extraction/extraction-pipeline.js
+src/crawler/extraction-runner.js
+src/storage/page-record-store.js
 ```
+
+M4 converts fetched HTML into deterministic semantic PageRecords with headings, paragraphs, links, lists, tables, code blocks, metadata, warnings, content/structure hashes, and restart-safe extraction state.
 
 Verification:
 
 ```text
-tests/unit/m2.test.js
-tests/unit/m2-recovery.test.js
+tests/unit/m4.test.js
+tests/node/m4-verify.mjs
+.github/workflows/m4-verify.yml
 ```
 
-M2 provides deterministic scheduling, persisted lifecycle controls, idempotent commands, progress statistics, and service-worker restart repair. It does not fetch pages; that begins in M3.
-
-Evidence: `M2_IMPLEMENTATION_REPORT.md`.
+Evidence: `M4_IMPLEMENTATION_REPORT.md`.
 
 ## 10. Current Progress
 
 ```text
 Documentation: 100% for the current approved scope
 M0: implemented; manual Chrome acceptance pending
-M1: implemented and locally verified
-M2: implemented and locally verified
-Overall functional product: approximately 32%
-Next target: M3 Page Fetching and Link Discovery
+M1: implemented and verified
+M2: implemented and verified
+M3: implemented and verified
+M4: implemented and automated verification passing
+Overall functional product: approximately 58%
+Next target: M5 Markdown and JSON Archive Generation
 ```
 
 ## 11. Completion Objective
