@@ -1,4 +1,4 @@
-import { CRAWL_STATES, SCHEMA_VERSION } from "../shared/constants.js";
+import { APP_VERSION, CRAWL_STATES, SCHEMA_VERSION } from "../shared/constants.js";
 import { createId } from "../shared/id.js";
 import { failure, success } from "../shared/result.js";
 import { createCrawlConfig } from "../crawler/crawl-config.js";
@@ -11,10 +11,11 @@ import { createPriorityTaskQueue } from "../crawler/priority-task-queue.js";
 import { applyRunTransition } from "../crawler/state-transition.js";
 import { createTaskRecord, TASK_STATES } from "../crawler/task-record.js";
 import { inspectUrl } from "../crawler/url-intelligence.js";
+import { buildArchive } from "../export/archive-builder.js";
 import { findCachedRequest, rememberRequest } from "../messaging/request-cache.js";
 import { loadActiveCrawl, repairInterruptedSnapshot, saveActiveCrawl } from "../storage/crawl-store.js";
 import { deleteFetchedHtml, getFetchedHtml, putFetchedHtml } from "../storage/page-html-store.js";
-import { putPageRecord } from "../storage/page-record-store.js";
+import { listPageRecords, putPageRecord } from "../storage/page-record-store.js";
 
 function taskIdFor(crawlId, sequence) {
   return `task_${crawlId}_${sequence}`;
@@ -295,6 +296,34 @@ export function createRuntimeController(options = {}) {
     return persist(snapshot);
   }
 
+  async function buildExport(crawlId, exportOptions = {}) {
+    const loaded = await load();
+    if (!loaded.ok) return loaded;
+    const target = validateCrawlTarget(loaded.value, crawlId);
+    if (!target.ok) return target;
+    const snapshot = target.value;
+    if (!isTerminal(snapshot.run.lifecycle)) {
+      return failure("CRAWL_NOT_STABLE_FOR_EXPORT", "Archive export requires a terminal crawl snapshot", false, {
+        lifecycle: snapshot.run.lifecycle
+      });
+    }
+    const pages = await listPageRecords(crawlId, options.indexedDBFactory);
+    if (!pages.ok) return pages;
+    if (pages.value.length === 0) {
+      return failure("EMPTY_ARCHIVE", "No extracted PageRecords exist for this crawl");
+    }
+    try {
+      return success(buildArchive(snapshot, pages.value, {
+        softwareVersion: APP_VERSION,
+        includeEmptyFailureReport: exportOptions.includeEmptyFailureReport === true
+      }));
+    } catch (error) {
+      return failure("ARCHIVE_BUILD_FAILED", "Archive could not be built", false, {
+        message: error instanceof Error ? error.message : String(error)
+      });
+    }
+  }
+
   async function processNextTask() {
     const loaded = await load();
     if (!loaded.ok) return loaded;
@@ -328,6 +357,7 @@ export function createRuntimeController(options = {}) {
     getSummary,
     getEvents,
     restoreActiveCrawl,
+    buildExport,
     processNextTask
   });
 }
