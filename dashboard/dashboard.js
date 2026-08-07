@@ -7,8 +7,10 @@ const elements = {
   version: document.querySelector("#version"),
   queuedCount: document.querySelector("#queued-count"),
   fetchedCount: document.querySelector("#fetched-count"),
+  extractedCount: document.querySelector("#extracted-count"),
   failedCount: document.querySelector("#failed-count"),
   crawlList: document.querySelector("#crawl-list"),
+  pageList: document.querySelector("#page-list"),
   eventList: document.querySelector("#event-list"),
   settingsList: document.querySelector("#settings-list"),
   status: document.querySelector("#status"),
@@ -38,10 +40,25 @@ function renderSettings(settings) {
   ]);
 }
 
+function renderPages(pages = []) {
+  elements.pageList.replaceChildren();
+  for (const page of pages) {
+    const item = document.createElement("li");
+    item.textContent = `${page.title} · ${page.blockCount} blocks · ${page.headingCount} headings · ${page.warningCount} warnings`;
+    elements.pageList.append(item);
+  }
+  if (pages.length === 0) {
+    const item = document.createElement("li");
+    item.textContent = "No pages extracted yet.";
+    elements.pageList.append(item);
+  }
+}
+
 function renderCrawl(summary) {
   const counts = summary?.counts ?? {};
   elements.queuedCount.textContent = String(counts.queued ?? 0);
   elements.fetchedCount.textContent = String(counts.fetched ?? 0);
+  elements.extractedCount.textContent = String(counts.extracted ?? 0);
   elements.failedCount.textContent = String(counts.failed ?? 0);
   renderDefinitionList(elements.crawlList, summary ? [
     ["Crawl ID", summary.crawlId],
@@ -52,9 +69,12 @@ function renderCrawl(summary) {
     ["Queued", counts.queued ?? 0],
     ["Fetching", counts.fetching ?? 0],
     ["Fetched", counts.fetched ?? 0],
+    ["Extracting", counts.extracting ?? 0],
+    ["Extracted", counts.extracted ?? 0],
     ["Skipped", counts.skipped ?? 0],
     ["Failed", counts.failed ?? 0]
   ] : [["Status", "No active crawl"]]);
+  renderPages(summary?.pageSummaries ?? []);
 }
 
 function renderEvents(events) {
@@ -63,9 +83,11 @@ function renderEvents(events) {
     const item = document.createElement("li");
     const detail = event.payload?.reasonCode
       ? ` · ${event.payload.reasonCode}`
-      : event.payload?.finalUrl
-        ? ` · ${event.payload.finalUrl}`
-        : "";
+      : event.payload?.title
+        ? ` · ${event.payload.title}`
+        : event.payload?.finalUrl
+          ? ` · ${event.payload.finalUrl}`
+          : "";
     item.textContent = `#${event.sequence} ${event.type} — ${event.payload.lifecycle}${detail}`;
     elements.eventList.append(item);
   }
@@ -104,7 +126,7 @@ async function refresh() {
   } else {
     renderEvents([]);
   }
-  elements.status.textContent = "M3 runtime connected.";
+  elements.status.textContent = "M4 runtime connected.";
 }
 
 elements.refreshButton.addEventListener("click", () => void refresh());
