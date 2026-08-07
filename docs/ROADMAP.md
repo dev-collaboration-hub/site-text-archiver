@@ -12,12 +12,12 @@ This roadmap is executed through a single-owner workflow.
 
 A milestone is complete only when:
 
-- Its required source files exist.
-- Its main behavior works.
-- Required tests are implemented.
-- Errors are returned clearly.
-- Documentation matches the implementation.
-- No placeholder, empty function, mock-only path, or unchecked claim is counted as complete.
+- Required source files exist.
+- Main behavior works.
+- Required tests exist and pass where executable verification is available.
+- Errors are explicit.
+- Documentation matches implementation.
+- No placeholder or unchecked claim is counted as complete.
 
 Progress percentages represent working product capability, not documentation volume.
 
@@ -25,116 +25,86 @@ Progress percentages represent working product capability, not documentation vol
 
 ## M0 — Project Foundation
 
-### Status
+**Status:** Implemented; Chrome load-unpacked acceptance remains to be manually recorded.
 
-**Implemented in source. Chrome load-unpacked acceptance remains to be manually recorded using `M0_BROWSER_ACCEPTANCE_CHECKLIST.md`.**
-
-### Product Completion
-
-10%
+**Product completion:** 10%
 
 ---
 
 ## M1 — URL Intelligence and Safety
 
-### Status
-
-**Implemented and verified with pure-module tests.**
+**Status:** Implemented and verified.
 
 Evidence: `M1_IMPLEMENTATION_REPORT.md`.
 
-### Product Completion
-
-20%
+**Product completion:** 20%
 
 ---
 
 ## M2 — Crawl Queue and State Machine
 
-### Status
-
-**Implemented and verified with deterministic module, mocked-storage, command-flow, and restart-recovery tests.**
+**Status:** Implemented and verified.
 
 Evidence: `M2_IMPLEMENTATION_REPORT.md`.
 
-### Product Completion
-
-32%
+**Product completion:** 32%
 
 ---
 
 ## M3 — Page Fetching and Link Discovery
 
-### Status
-
-**Implemented with local pure-module and mocked processing-loop verification plus repository regression coverage.**
+**Status:** Implemented and verified.
 
 Evidence: `M3_IMPLEMENTATION_REPORT.md`.
 
-### Delivered
+Delivered bounded HTML fetching, retry classification, redirect revalidation, scratch-built link discovery, IndexedDB fetched-HTML storage, M1 admission checks, and Manifest V3 alarm-driven processing.
 
-- GET-only bounded page fetcher
-- Timeout handling
-- Cooperative active-fetch Pause/Cancel cancellation
-- HTML content-type validation
-- Content-Length and actual byte-size limits
-- HTTP response classification
-- Retry-After-aware retry scheduling
-- Temporary/permanent failure separation
-- Redirect final-URL M1 revalidation
-- Scratch-built HTML start-tag scanner
-- Base URL handling
-- Canonical-link awareness
-- Deterministic anchor/area link discovery
-- M1 safety validation before queue insertion
-- Fetch metadata records
-- IndexedDB storage for downloaded HTML
-- Manifest V3 alarm-driven network loop
-- Per-origin optional host-permission request
-- Dashboard fetched/skipped/failed progress
-
-### Acceptance Results
-
-- Only approved HTML responses are stored for extraction.
-- Temporary network/server failures are retryable and permanent non-HTML/client failures are skipped or failed explicitly.
-- Newly discovered links pass M1 normalization, origin/path/safety, depth, limit, and duplicate checks before queue insertion.
-- Redirected final URLs are revalidated before acceptance.
-
-### Runtime Boundary
-
-M3 performs the real network crawl and leaves accepted tasks in `FETCHED` with source HTML stored locally. Semantic content extraction starts in M4.
-
-### Product Completion
-
-43%
+**Product completion:** 43%
 
 ---
 
 ## M4 — Semantic Content Extraction
 
-### Goal
+### Status
 
-Extract useful documentation content while preserving technical structure.
+**Implemented and verified with repository regression tests and dependency-free GitHub Actions execution.**
 
-### Deliverables
+Evidence: `M4_IMPLEMENTATION_REPORT.md`.
 
-- DOM/HTML cleanup
-- Main-content candidate detection
-- Text-density scoring
-- Heading hierarchy extraction
-- Paragraph extraction
-- Ordered and unordered lists
-- Table conversion
-- Code block preservation
-- Relevant link preservation
-- Page metadata extraction
-- Extraction warnings
+### Delivered
 
-### Acceptance Criteria
+- Scratch-built inert HTML AST parser
+- Deterministic DOM cleaning and hidden-node removal
+- Evidence-based main-content detection
+- Explicit semantic-root preference with body fallback
+- Heading hierarchy and heading paths
+- Paragraphs with inline code and links
+- Ordered/unordered nested lists
+- Table normalization with simple span expansion and warnings
+- Code-block whitespace and language-hint preservation
+- Blockquotes, callouts, horizontal rules, and useful image alt text
+- Title, description, author, language, and canonical metadata
+- Deterministic plain text and preliminary Markdown
+- Browser-native SHA-256 content and structure hashes
+- IndexedDB PageRecord persistence
+- Persisted `FETCHED -> EXTRACTING -> EXTRACTED` flow
+- Raw fetched-HTML cleanup after successful extraction
+- Extraction restart recovery after Manifest V3 worker interruption
+- Dashboard extraction counts and page summaries
 
-- Extracted content remains readable and structurally correct.
-- Code blocks and tables remain usable.
-- Navigation and repeated interface content are substantially reduced.
+### Acceptance Results
+
+- Extracted content preserves technical order and structure.
+- Code blocks remain separate and preserve whitespace.
+- Tables retain row/column order and simple spans are normalized.
+- Explicit main/article roots are preferred over navigation-heavy body fallback.
+- Hidden/executable markup does not participate in extraction.
+- Raw HTML is not copied into PageRecords.
+- Exact committed M4 extraction code passes dependency-free GitHub Actions verification.
+
+### Deferred Boundary
+
+Cross-page boilerplate scoring, duplicate-content classification, and quality scoring remain in M6 rather than being falsely counted as M4.
 
 ### Product Completion
 
@@ -146,7 +116,26 @@ Extract useful documentation content while preserving technical structure.
 
 ### Goal
 
-Generate deterministic, source-backed archives.
+Generate deterministic, source-backed archives from extracted PageRecords.
+
+### Deliverables
+
+- Stable PageRecord ordering
+- Final page-to-Markdown conversion
+- Heading-level normalization for combined documents
+- Source URL blocks
+- Table of contents
+- Combined Markdown archive
+- Structured JSON archive
+- Crawl report
+- Failed-page report
+- Browser download integration
+
+### Acceptance Criteria
+
+- The same stored crawl produces the same export.
+- Markdown renders correctly.
+- Every exported page remains source-linked.
 
 ### Product Completion
 
@@ -158,7 +147,7 @@ Generate deterministic, source-backed archives.
 
 ### Goal
 
-Add deterministic planning, quality scoring, and bounded recovery decisions.
+Add deterministic planning, cross-page boilerplate/duplicate analysis, quality scoring, and bounded recovery decisions.
 
 ### Product Completion
 
@@ -219,4 +208,4 @@ M0 Foundation
 
 ## Current Next Target
 
-**M4 — Semantic Content Extraction**.
+**M5 — Markdown and JSON Archive Generation**.
