@@ -76,35 +76,15 @@ Evidence: `M4_IMPLEMENTATION_REPORT.md`.
 - Scratch-built inert HTML AST parser
 - Deterministic DOM cleaning and hidden-node removal
 - Evidence-based main-content detection
-- Explicit semantic-root preference with body fallback
-- Heading hierarchy and heading paths
-- Paragraphs with inline code and links
+- Heading/paragraph/link extraction
 - Ordered/unordered nested lists
-- Table normalization with simple span expansion and warnings
-- Code-block whitespace and language-hint preservation
+- Table normalization with simple span expansion
+- Code-block whitespace/language preservation
 - Blockquotes, callouts, horizontal rules, and useful image alt text
-- Title, description, author, language, and canonical metadata
-- Deterministic plain text and preliminary Markdown
-- Browser-native SHA-256 content and structure hashes
+- Page metadata and canonical URLs
+- Browser-native SHA-256 hashes
 - IndexedDB PageRecord persistence
-- Persisted `FETCHED -> EXTRACTING -> EXTRACTED` flow
-- Raw fetched-HTML cleanup after successful extraction
-- Extraction restart recovery after Manifest V3 worker interruption
-- Dashboard extraction counts and page summaries
-
-### Acceptance Results
-
-- Extracted content preserves technical order and structure.
-- Code blocks remain separate and preserve whitespace.
-- Tables retain row/column order and simple spans are normalized.
-- Explicit main/article roots are preferred over navigation-heavy body fallback.
-- Hidden/executable markup does not participate in extraction.
-- Raw HTML is not copied into PageRecords.
-- Exact committed M4 extraction code passes dependency-free GitHub Actions verification.
-
-### Deferred Boundary
-
-Cross-page boilerplate scoring, duplicate-content classification, and quality scoring remain in M6 rather than being falsely counted as M4.
+- Restart-safe extraction state
 
 ### Product Completion
 
@@ -114,28 +94,46 @@ Cross-page boilerplate scoring, duplicate-content classification, and quality sc
 
 ## M5 — Markdown and JSON Archive Generation
 
-### Goal
+### Status
 
-Generate deterministic, source-backed archives from extracted PageRecords.
+**Implemented and verified with browser regression coverage and dependency-free GitHub Actions export verification.**
 
-### Deliverables
+Evidence: `M5_IMPLEMENTATION_REPORT.md`.
 
-- Stable PageRecord ordering
-- Final page-to-Markdown conversion
-- Heading-level normalization for combined documents
-- Source URL blocks
-- Table of contents
+### Delivered
+
+- Stable start-page/navigation/depth/discovery/URL ordering
+- Final semantic-block-to-Markdown conversion
+- Combined-document heading normalization
+- Safe inline and block code rendering
+- Code fences longer than embedded backtick runs
+- Markdown table escaping
+- Per-page source URL blocks
+- Stable duplicate-title TOC labels and anchors
 - Combined Markdown archive
-- Structured JSON archive
-- Crawl report
-- Failed-page report
-- Browser download integration
+- Recursively stable-sorted structured JSON archive
+- Crawl report with state, bytes, retries, reason codes, and warnings
+- Conditional failed-page report
+- Stable terminal-snapshot export boundary
+- Empty-archive rejection
+- `EXPORT_ARCHIVE` runtime command
+- Browser `downloads` integration
+- Filename/path traversal sanitization
+- Dashboard archive-download control
 
-### Acceptance Criteria
+### Acceptance Results
 
-- The same stored crawl produces the same export.
-- Markdown renders correctly.
-- Every exported page remains source-linked.
+- Identical persisted input produces identical export file bytes in automated verification.
+- Start-page ordering and deterministic tie-breaking are tested.
+- Every exported page includes its source URL.
+- Duplicate page titles receive unique TOC anchors.
+- Embedded backticks and table pipes render safely.
+- Failed/skipped task reason codes remain visible in the failure report.
+- Mocked browser-download integration emits the expected supported files.
+
+### Manual Browser Boundary
+
+Real Chrome `Load unpacked`, IndexedDB-to-download click flow, and very-large-export browser behavior remain explicit manual/reliability acceptance items.
 
 ### Product Completion
 
@@ -208,4 +206,4 @@ M0 Foundation
 
 ## Current Next Target
 
-**M5 — Markdown and JSON Archive Generation**.
+**M6 — Offline Agent Controller and Quality System**.
