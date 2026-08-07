@@ -6,7 +6,7 @@ const elements = {
   runtimeState: document.querySelector("#runtime-state"),
   version: document.querySelector("#version"),
   queuedCount: document.querySelector("#queued-count"),
-  completedCount: document.querySelector("#completed-count"),
+  fetchedCount: document.querySelector("#fetched-count"),
   failedCount: document.querySelector("#failed-count"),
   crawlList: document.querySelector("#crawl-list"),
   eventList: document.querySelector("#event-list"),
@@ -41,7 +41,7 @@ function renderSettings(settings) {
 function renderCrawl(summary) {
   const counts = summary?.counts ?? {};
   elements.queuedCount.textContent = String(counts.queued ?? 0);
-  elements.completedCount.textContent = String(counts.completed ?? 0);
+  elements.fetchedCount.textContent = String(counts.fetched ?? 0);
   elements.failedCount.textContent = String(counts.failed ?? 0);
   renderDefinitionList(elements.crawlList, summary ? [
     ["Crawl ID", summary.crawlId],
@@ -51,7 +51,7 @@ function renderCrawl(summary) {
     ["Discovered", counts.discovered ?? 0],
     ["Queued", counts.queued ?? 0],
     ["Fetching", counts.fetching ?? 0],
-    ["Completed", counts.completed ?? 0],
+    ["Fetched", counts.fetched ?? 0],
     ["Skipped", counts.skipped ?? 0],
     ["Failed", counts.failed ?? 0]
   ] : [["Status", "No active crawl"]]);
@@ -61,7 +61,12 @@ function renderEvents(events) {
   elements.eventList.replaceChildren();
   for (const event of events) {
     const item = document.createElement("li");
-    item.textContent = `#${event.sequence} ${event.type} — ${event.payload.lifecycle}`;
+    const detail = event.payload?.reasonCode
+      ? ` · ${event.payload.reasonCode}`
+      : event.payload?.finalUrl
+        ? ` · ${event.payload.finalUrl}`
+        : "";
+    item.textContent = `#${event.sequence} ${event.type} — ${event.payload.lifecycle}${detail}`;
     elements.eventList.append(item);
   }
   if (events.length === 0) {
@@ -99,7 +104,7 @@ async function refresh() {
   } else {
     renderEvents([]);
   }
-  elements.status.textContent = "M2 runtime connected.";
+  elements.status.textContent = "M3 runtime connected.";
 }
 
 elements.refreshButton.addEventListener("click", () => void refresh());
