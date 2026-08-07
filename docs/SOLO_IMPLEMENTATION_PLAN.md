@@ -84,8 +84,8 @@ Maintained verification layers include:
 - Service-worker restart-recovery tests
 - Dependency-free Node verification in GitHub Actions
 - IndexedDB-backed runtime implementation with manual Chrome acceptance still pending
+- Deterministic archive/golden-style tests
 - Future local crawl-site fixtures
-- Future golden archive outputs
 - Manual Chrome extension acceptance instructions
 
 M0 manual verification remains tracked in `M0_BROWSER_ACCEPTANCE_CHECKLIST.md`.
@@ -102,7 +102,7 @@ The implementation must not depend on:
 - Cloud databases
 - Remote analytics
 
-Permitted foundations include standard JavaScript, URL and Fetch APIs, IndexedDB, Web Workers, Chrome Extension APIs, and browser-native Web Crypto. M4 uses a scratch-built inert HTML AST parser rather than a third-party HTML parsing library.
+Permitted foundations include standard JavaScript, URL and Fetch APIs, IndexedDB, Web Workers, Chrome Extension APIs, and browser-native Web Crypto. HTML parsing and export formatting remain scratch-built rather than relying on third-party parser/export libraries.
 
 ## 9. Current Implementation State
 
@@ -120,39 +120,42 @@ Implemented and verified. Evidence: `M2_IMPLEMENTATION_REPORT.md`.
 
 ### M3 — Page fetching and link discovery
 
-Implemented and verified. The extension can perform bounded HTML fetching, classify retry/permanent failures, discover connected links, revalidate them through M1, persist crawl state, and store fetched HTML for extraction.
-
-Evidence: `M3_IMPLEMENTATION_REPORT.md`.
+Implemented and verified. Evidence: `M3_IMPLEMENTATION_REPORT.md`.
 
 ### M4 — Semantic content extraction
+
+Implemented and verified. Evidence: `M4_IMPLEMENTATION_REPORT.md`.
+
+### M5 — Markdown and JSON archive generation
 
 Implemented and verified.
 
 Primary source:
 
 ```text
-src/extraction/dom-utils.js
-src/extraction/html-parser.js
-src/extraction/dom-cleaner.js
-src/extraction/main-content-detector.js
-src/extraction/content-extractor.js
-src/extraction/page-record.js
-src/extraction/extraction-pipeline.js
-src/crawler/extraction-runner.js
-src/storage/page-record-store.js
+src/export/markdown-escape.js
+src/export/code-fence.js
+src/export/table-renderer.js
+src/export/markdown-converter.js
+src/export/page-ordering.js
+src/export/toc-builder.js
+src/export/report-generator.js
+src/export/archive-builder.js
+src/export/file-names.js
+src/export/download-adapter.js
 ```
 
-M4 converts fetched HTML into deterministic semantic PageRecords with headings, paragraphs, links, lists, tables, code blocks, metadata, warnings, content/structure hashes, and restart-safe extraction state.
+M5 converts persisted PageRecords into deterministic combined Markdown, stable structured JSON, crawl/failure reports, and browser downloads. Export requires a terminal persisted crawl snapshot and never refetches source pages.
 
 Verification:
 
 ```text
-tests/unit/m4.test.js
-tests/node/m4-verify.mjs
-.github/workflows/m4-verify.yml
+tests/unit/m5.test.js
+tests/node/m5-verify.mjs
+.github/workflows/m5-verify.yml
 ```
 
-Evidence: `M4_IMPLEMENTATION_REPORT.md`.
+Evidence: `M5_IMPLEMENTATION_REPORT.md`.
 
 ## 10. Current Progress
 
@@ -163,8 +166,9 @@ M1: implemented and verified
 M2: implemented and verified
 M3: implemented and verified
 M4: implemented and automated verification passing
-Overall functional product: approximately 58%
-Next target: M5 Markdown and JSON Archive Generation
+M5: implemented and automated verification passing; real Chrome download acceptance pending
+Overall functional product: approximately 68%
+Next target: M6 Offline Agent Controller and Quality System
 ```
 
 ## 11. Completion Objective
