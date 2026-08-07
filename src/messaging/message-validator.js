@@ -8,7 +8,8 @@ const CRAWL_TARGET_MESSAGES = new Set([
   MESSAGE_TYPES.CRAWL_RESUME,
   MESSAGE_TYPES.CRAWL_CANCEL,
   MESSAGE_TYPES.GET_CRAWL_SUMMARY,
-  MESSAGE_TYPES.GET_AGENT_EVENTS
+  MESSAGE_TYPES.GET_AGENT_EVENTS,
+  MESSAGE_TYPES.EXPORT_ARCHIVE
 ]);
 
 export function createMessage(type, requestId, payload = {}, timestamp = Date.now()) {
@@ -49,6 +50,9 @@ export function validateMessage(message) {
         return failure("INVALID_PAYLOAD", `${field} must be a non-negative integer`);
       }
     }
+  }
+  if (message.type === MESSAGE_TYPES.EXPORT_ARCHIVE && message.payload.includeEmptyFailureReport !== undefined && typeof message.payload.includeEmptyFailureReport !== "boolean") {
+    return failure("INVALID_PAYLOAD", "includeEmptyFailureReport must be boolean");
   }
   return success({ ...message, payload: { ...message.payload } });
 }
