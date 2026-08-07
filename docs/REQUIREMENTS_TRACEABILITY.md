@@ -8,7 +8,7 @@ This document maps product capabilities to milestones, source files, and verific
 
 - **Documented** — design exists; working behavior is not complete.
 - **Implemented** — source exists and main behavior is present.
-- **Verified locally** — deterministic automated or mocked-environment evidence passes.
+- **Verified** — deterministic automated, mocked-environment, or CI evidence passes.
 - **Manual acceptance pending** — browser interaction still needs to be recorded.
 - **Deferred** — intentionally outside the current functional-release boundary.
 
@@ -16,89 +16,75 @@ This document maps product capabilities to milestones, source files, and verific
 
 | Capability | Milestone | Implementation | Evidence | Current state |
 |---|---:|---|---|---|
-| Manifest V3 extension shell | M0 | `manifest.json`, `src/background/` | Syntax checks; Chrome checklist | Implemented; manual acceptance pending |
-| Shared results, IDs, and settings | M0 | `src/shared/`, `src/storage/settings-store.js` | `tests/unit/index.test.js` | Verified locally; browser persistence pending |
-| Popup and dashboard foundation | M0 | `popup/`, `dashboard/` | Manual render and console checks | Implemented; manual acceptance pending |
-| URL resolution and canonicalization | M1 | `url-resolver.js`, `url-normalizer.js`, `query-policy.js`, `url-intelligence.js` | M1 unit and edge tests | Verified locally |
-| Origin, path, pattern, limit, and unsafe-link enforcement | M1 | `scope-guard.js`, `link-safety.js`, `blocked-extensions.js` | M1 scope and safety tests | Verified locally |
-| Duplicate URL intelligence | M1 | `duplicate-url-registry.js` | Duplicate and snapshot tests | Verified locally |
-| Crawl configuration bounds | M2 | `src/crawler/crawl-config.js` | M2 configuration and command-flow tests | Verified locally |
-| Crawl lifecycle state machine | M2 | `crawl-state.js`, `state-transition.js`, `crawl-run.js` | Valid, invalid, terminal, and version tests | Verified locally |
-| Deterministic task queue | M2 | `task-record.js`, `priority-task-queue.js` | Ordering, duplicate, dequeue, and snapshot tests | Verified locally |
-| Persisted resumable crawl state | M2 | `src/storage/crawl-store.js`, `runtime-controller.js` | Mocked storage and restart-recovery tests | Verified locally |
-| Idempotent state-changing commands | M2 | `request-cache.js`, `runtime-controller.js` | Request replay and misuse tests | Verified locally |
-| Pause, resume, and cancel controls | M2/M3 | service worker, popup, runtime controller, fetcher | State-flow and cooperative abort tests | Implemented and locally verified; manual browser acceptance pending |
-| Crawl counts and progress events | M2/M3 | `crawl-run.js`, `progress-events.js`, dashboard | Event and summary integration tests | Verified locally |
-| Bounded HTML fetching | M3 | `fetcher.js`, `response-classifier.js` | Pure response/fetch tests and M3 regression suite | Verified locally |
-| Link discovery and base URL handling | M3 | `link-discovery.js` | Scratch-scanner, base, canonical, dedupe, entity tests | Verified locally |
-| Failure and retry classification | M3 | `response-classifier.js`, `network-crawler.js` | Retry-After, temporary/permanent, mocked-flow tests | Verified locally |
-| Redirect and discovered-link safety | M3 | `network-crawler.js` + M1 URL intelligence | Mocked fetch→discover→queue flow | Verified locally |
-| Fetched HTML persistence | M3 | `page-html-store.js`, `fetch-record.js` | Integration contract and mocked processing loop | Implemented; browser IndexedDB acceptance pending |
-| Manifest V3 network scheduling | M3 | `alarm-adapter.js`, service worker | Code-path verification; browser alarm acceptance pending | Implemented; manual browser acceptance pending |
-| Semantic content extraction | M4 | planned `src/extraction/` | HTML fixture and golden-output tests | Documented |
-| Markdown and JSON archive export | M5 | planned `src/export/` | Golden Markdown and JSON tests | Documented |
-| Offline agent quality and bounded recovery | M6 | planned `src/agent/`, `src/quality/` | Deterministic decision and scoring tests | Documented |
-| Local search index | M7 | planned `src/search/` | Ranking and deterministic-index tests | Documented |
-| Extractive local question answering | M8 | planned `src/qa/` | Passage, evidence, and attribution tests | Documented |
-| Complete dashboard and functional release | M9 | popup, dashboard, release artifacts | End-to-end browser acceptance | Documented |
-| Security and privacy hardening beyond baseline | Deferred | future hardening work | Separate review plan | Deferred |
+| Manifest V3 extension shell | M0 | `manifest.json`, `src/background/` | Chrome checklist | Implemented; manual acceptance pending |
+| Shared results, IDs, and settings | M0 | `src/shared/`, `settings-store.js` | M0 unit tests | Verified; browser persistence pending |
+| Popup and dashboard foundation | M0 | `popup/`, `dashboard/` | Manual render checks | Implemented; manual acceptance pending |
+| URL resolution and canonicalization | M1 | M1 URL modules | M1 unit/edge tests | Verified |
+| Origin/path/pattern/safety enforcement | M1 | M1 scope modules | M1 scope/safety tests | Verified |
+| Duplicate URL intelligence | M1 | `duplicate-url-registry.js` | Duplicate/snapshot tests | Verified |
+| Crawl configuration and lifecycle | M2 | M2 crawl modules | State/config tests | Verified |
+| Deterministic persisted task queue | M2 | task/queue/store modules | Queue/recovery tests | Verified |
+| Idempotent lifecycle commands | M2 | request cache/runtime controller | Replay tests | Verified |
+| Bounded HTML fetching | M3 | `fetcher.js`, `response-classifier.js` | M3 tests | Verified |
+| Link discovery and base/canonical handling | M3 | `link-discovery.js` | M3 scanner tests | Verified |
+| Retry and permanent-failure classification | M3 | network crawler/response classifier | M3 tests | Verified |
+| Redirect/discovered-link M1 safety | M3 | network crawler + M1 | Mocked processing flow | Verified |
+| Fetched HTML persistence | M3 | `page-html-store.js` | Runtime integration | Implemented; browser IndexedDB acceptance pending |
+| Manifest V3 alarm scheduling | M3/M4 | alarm adapter/service worker | Runtime integration | Implemented; browser acceptance pending |
+| Inert scratch HTML parsing | M4 | `html-parser.js`, `dom-utils.js` | M4 browser tests + GitHub Actions | Verified |
+| Unsafe/hidden DOM cleanup | M4 | `dom-cleaner.js` | M4 cleanup tests | Verified |
+| Main-content selection | M4 | `main-content-detector.js` | Semantic-root preference tests | Verified |
+| Heading/paragraph/link extraction | M4 | `content-extractor.js` | M4 semantic tests | Verified |
+| Nested list preservation | M4 | `content-extractor.js` | M4 nested-list tests | Verified |
+| Table and code-block preservation | M4 | `content-extractor.js` | Span/code tests | Verified |
+| Page metadata extraction | M4 | `content-extractor.js` | M4 metadata tests | Verified |
+| Deterministic PageRecord/hash creation | M4 | `page-record.js`, `extraction-pipeline.js` | Node CI and browser tests | Verified |
+| PageRecord IndexedDB persistence | M4 | `page-record-store.js` | Runtime contract | Implemented; browser IndexedDB acceptance pending |
+| Extraction state/restart recovery | M4 | `extraction-runner.js`, `crawl-store.js`, runtime controller | M4 runner + recovery behavior | Verified |
+| Markdown and JSON archive export | M5 | planned `src/export/` | Golden archive tests | Documented |
+| Offline agent quality and bounded recovery | M6 | planned `src/agent/`, `src/quality/` | Deterministic scoring/decision tests | Documented |
+| Local search index | M7 | planned `src/search/` | Ranking/index tests | Documented |
+| Extractive local question answering | M8 | planned `src/qa/` | Passage/evidence tests | Documented |
+| Complete dashboard and functional release | M9 | UI/release artifacts | End-to-end browser acceptance | Documented |
+| Security/privacy hardening beyond baseline | Deferred | future hardening | Separate review plan | Deferred |
 
-## 4. M0 Evidence
+## 4. Milestone Evidence
 
-Source and smoke tests exist for the extension shell, messages, settings, identifiers, popup, and dashboard. Chrome load-unpacked and restart-persistence results remain to be recorded in `M0_BROWSER_ACCEPTANCE_CHECKLIST.md`.
+- M1: `M1_IMPLEMENTATION_REPORT.md`
+- M2: `M2_IMPLEMENTATION_REPORT.md`
+- M3: `M3_IMPLEMENTATION_REPORT.md`
+- M4: `M4_IMPLEMENTATION_REPORT.md`
 
-## 5. M1 Evidence
-
-Detailed evidence: `M1_IMPLEMENTATION_REPORT.md`.
-
-## 6. M2 Evidence
-
-Detailed evidence: `M2_IMPLEMENTATION_REPORT.md`.
-
-## 7. M3 Evidence
-
-Source:
+M4 automated evidence includes:
 
 ```text
-src/crawler/response-classifier.js
-src/crawler/fetcher.js
-src/crawler/link-discovery.js
-src/crawler/fetch-record.js
-src/crawler/network-crawler.js
-src/storage/page-html-store.js
-src/background/alarm-adapter.js
+tests/unit/m4.test.js
+tests/node/m4-verify.mjs
+.github/workflows/m4-verify.yml
 ```
 
-Integration:
+The dependency-free GitHub Actions verification executes the committed scratch parser, cleaner, main-content detector, semantic extractor, PageRecord builder, SHA-256 hashing, and preliminary Markdown derivation.
 
-```text
-src/background/runtime-controller.js
-src/background/service-worker.js
-src/crawler/crawl-run.js
-src/crawler/progress-events.js
-manifest.json
-popup/
-dashboard/
-```
+## 5. Deferred M4-adjacent Capabilities
 
-Tests:
+The following are not falsely counted as M4 completion:
 
-```text
-tests/unit/m3.test.js
-```
+- Cross-page boilerplate-frequency scoring
+- Exact/near duplicate-content analysis
+- Quality score/band decisions
+- Quality-driven extraction retry policy
 
-Local execution verified response classification, Retry-After, scratch link discovery, bounded fetching, and a mocked fetch → store → discover → M1 approve → queue processing flow.
+Those remain M6 responsibilities.
 
-Detailed evidence: `M3_IMPLEMENTATION_REPORT.md`.
-
-## 8. Current State
+## 6. Current State
 
 ```text
 Documentation foundation: 100% for current approved scope
 M0: implemented; manual Chrome acceptance pending
-M1: implemented and locally verified
-M2: implemented and locally verified
-M3: implemented and locally verified; browser load-unpacked/network acceptance pending
-Functional product completion: approximately 43%
-Next target: M4 Semantic Content Extraction
+M1: implemented and verified
+M2: implemented and verified
+M3: implemented and verified; browser network acceptance pending
+M4: implemented and automated verification passing; browser IndexedDB/UI acceptance pending
+Functional product completion: approximately 58%
+Next target: M5 Markdown and JSON Archive Generation
 ```
