@@ -158,8 +158,7 @@ export async function processNextNetworkTask(snapshot, dependencies = {}) {
   }
 
   const finalInspection = inspectUrl(fetched.value.finalUrl, null, next.config, {
-    depth: task.depth,
-    currentPageCount: queue.totalSize()
+    depth: task.depth
   });
   if (!finalInspection.ok || !finalInspection.value.scope.allowed) {
     const liveQueue = createPriorityTaskQueue({ maxSize: next.config.maxPages, snapshot: next.queue });
@@ -232,7 +231,7 @@ export async function processNextNetworkTask(snapshot, dependencies = {}) {
 
   let canonicalUrl = null;
   if (discovery.value.canonicalUrl) {
-    const canonical = inspectUrl(discovery.value.canonicalUrl, null, next.config, { depth: task.depth, currentPageCount: liveQueue.totalSize() });
+    const canonical = inspectUrl(discovery.value.canonicalUrl, null, next.config, { depth: task.depth });
     if (canonical.ok && canonical.value.scope.allowed) canonicalUrl = canonical.value.normalizedUrl;
   }
 
