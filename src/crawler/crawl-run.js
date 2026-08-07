@@ -21,6 +21,7 @@ export function createCrawlRun(crawlId, now = Date.now()) {
       discovered: 0,
       queued: 0,
       fetching: 0,
+      fetched: 0,
       completed: 0,
       skipped: 0,
       failed: 0
@@ -48,6 +49,7 @@ export function syncRunCounts(run, queueCounts, now = Date.now()) {
       discovered: Object.values(queueCounts).reduce((sum, value) => sum + value, 0),
       queued: queueCounts.queued ?? 0,
       fetching: queueCounts.fetching ?? 0,
+      fetched: queueCounts.fetched ?? 0,
       completed: queueCounts.completed ?? 0,
       skipped: queueCounts.skipped ?? 0,
       failed: queueCounts.failed ?? 0
@@ -71,6 +73,7 @@ export function createCrawlSummary(snapshot) {
     counts: { ...snapshot.run.counts },
     currentTask,
     queuedTasks: snapshot.queue?.tasks?.filter(task => task.state === "QUEUED").length ?? 0,
+    fetchedPageCount: snapshot.fetchRecords?.length ?? 0,
     recentEventCount: snapshot.events?.length ?? 0,
     startUrl: snapshot.config.startUrl,
     createdAt: snapshot.run.createdAt,
