@@ -81,9 +81,14 @@ export function detectMainContent(documentNode) {
   if (deduped.length === 0) {
     return failure("NO_CONTENT_CANDIDATE", "No extractable content root was found");
   }
+
+  const explicit = deduped.filter(candidate => candidate.kind !== "body" && candidate.evidence.textLength >= 40);
+  const selectionPool = explicit.length > 0 ? explicit : deduped;
+  selectionPool.sort((a, b) => b.score - a.score || a.path.localeCompare(b.path));
   deduped.sort((a, b) => b.score - a.score || a.path.localeCompare(b.path));
-  const selected = deduped[0];
-  const runnerUp = deduped[1];
+
+  const selected = selectionPool[0];
+  const runnerUp = selectionPool[1];
   const gap = runnerUp ? selected.score - runnerUp.score : Math.max(0, selected.score);
   const confidence = Math.max(0, Math.min(1, 0.45 + gap / 220 + (selected.kind === "main" || selected.kind === "role-main" ? 0.15 : 0)));
   const warnings = [];
