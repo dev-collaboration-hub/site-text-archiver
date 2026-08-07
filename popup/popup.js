@@ -65,7 +65,7 @@ function renderCrawl(summary) {
   const lifecycle = summary?.lifecycle ?? "IDLE";
   const counts = summary?.counts ?? {};
   elements.crawlSummary.textContent = activeCrawlId
-    ? `${lifecycle} · queued ${counts.queued ?? 0} · completed ${counts.completed ?? 0} · ${activeCrawlId}`
+    ? `${lifecycle} · queued ${counts.queued ?? 0} · fetched ${counts.fetched ?? 0} · ${activeCrawlId}`
     : "No active crawl.";
 
   const hasActive = Boolean(activeCrawlId);
@@ -114,6 +114,15 @@ async function saveSetup() {
   return result;
 }
 
+async function requestOriginPermission(config) {
+  try {
+    const origin = new URL(config.allowedOrigin || config.startUrl).origin;
+    return chrome.permissions.request({ origins: [`${origin}/*`] });
+  } catch {
+    return false;
+  }
+}
+
 async function runControl(type, successMessage) {
   if (!activeCrawlId) return;
   setStatus("Updating crawl…");
@@ -153,6 +162,13 @@ elements.form.addEventListener("submit", async event => {
 });
 
 elements.createButton.addEventListener("click", async () => {
+  const draft = readForm();
+  const permissionGranted = await requestOriginPermission(draft);
+  if (!permissionGranted) {
+    setStatus("Site permission is required to crawl this origin.", "error");
+    return;
+  }
+
   setStatus("Creating crawl…");
   const saved = await saveSetup();
   if (!saved.ok) {
@@ -168,7 +184,7 @@ elements.createButton.addEventListener("click", async () => {
   }
   activeCrawlId = created.value.crawlId;
   await refreshCrawl();
-  setStatus("Crawl queue created and persisted.", "success");
+  setStatus("Crawl queue created. Start will fetch approved pages.", "success");
 });
 
 elements.startButton.addEventListener("click", () => {
