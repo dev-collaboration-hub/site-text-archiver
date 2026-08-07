@@ -1,5 +1,5 @@
 export const APP_NAME = "Site Text Archiver";
-export const APP_VERSION = "0.4.0";
+export const APP_VERSION = "0.5.0";
 export const SCHEMA_VERSION = 1;
 export const PROTOCOL_VERSION = 1;
 
