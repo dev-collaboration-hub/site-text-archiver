@@ -41,7 +41,13 @@ This document maps product capabilities to milestones, source files, and verific
 | Deterministic PageRecord/hash creation | M4 | `page-record.js`, `extraction-pipeline.js` | Node CI and browser tests | Verified |
 | PageRecord IndexedDB persistence | M4 | `page-record-store.js` | Runtime contract | Implemented; browser IndexedDB acceptance pending |
 | Extraction state/restart recovery | M4 | `extraction-runner.js`, `crawl-store.js`, runtime controller | M4 runner + recovery behavior | Verified |
-| Markdown and JSON archive export | M5 | planned `src/export/` | Golden archive tests | Documented |
+| Stable PageRecord ordering | M5 | `page-ordering.js` | M5 Node/browser tests | Verified |
+| Final Markdown rendering | M5 | `markdown-converter.js`, `code-fence.js`, `table-renderer.js`, `markdown-escape.js` | Backtick/table/heading tests | Verified |
+| Combined archive and TOC | M5 | `archive-builder.js`, `toc-builder.js` | Byte-stability + duplicate-title tests | Verified |
+| Structured JSON archive | M5 | `archive-builder.js` | Stable recursive JSON serialization tests | Verified |
+| Crawl and failed-page reports | M5 | `report-generator.js` | Bytes/retry/reason-code tests | Verified |
+| Terminal snapshot export boundary | M5 | runtime controller + archive builder | Runtime contract + M5 tests | Implemented; browser integration pending |
+| Browser archive download | M5 | `download-adapter.js`, dashboard, service worker | Mocked downloads API + CI | Implemented; real Chrome acceptance pending |
 | Offline agent quality and bounded recovery | M6 | planned `src/agent/`, `src/quality/` | Deterministic scoring/decision tests | Documented |
 | Local search index | M7 | planned `src/search/` | Ranking/index tests | Documented |
 | Extractive local question answering | M8 | planned `src/qa/` | Passage/evidence tests | Documented |
@@ -54,27 +60,29 @@ This document maps product capabilities to milestones, source files, and verific
 - M2: `M2_IMPLEMENTATION_REPORT.md`
 - M3: `M3_IMPLEMENTATION_REPORT.md`
 - M4: `M4_IMPLEMENTATION_REPORT.md`
+- M5: `M5_IMPLEMENTATION_REPORT.md`
 
-M4 automated evidence includes:
+M5 automated evidence includes:
 
 ```text
-tests/unit/m4.test.js
-tests/node/m4-verify.mjs
-.github/workflows/m4-verify.yml
+tests/unit/m5.test.js
+tests/node/m5-verify.mjs
+.github/workflows/m5-verify.yml
 ```
 
-The dependency-free GitHub Actions verification executes the committed scratch parser, cleaner, main-content detector, semantic extractor, PageRecord builder, SHA-256 hashing, and preliminary Markdown derivation.
+Dependency-free M5 verification executes the final Markdown renderer, code-fence policy, table escaping, page ordering, TOC builder, deterministic JSON archive builder, crawl/failure report generation, filename sanitization, and mocked downloads integration.
 
-## 5. Deferred M4-adjacent Capabilities
+## 5. Deferred M5-adjacent Capabilities
 
-The following are not falsely counted as M4 completion:
+The following are not falsely counted as M5 completion:
 
 - Cross-page boilerplate-frequency scoring
 - Exact/near duplicate-content analysis
 - Quality score/band decisions
-- Quality-driven extraction retry policy
+- Quality-driven recovery decisions
+- Large-archive browser stress testing
 
-Those remain M6 responsibilities.
+The intelligence features remain M6; broader browser reliability remains M9.
 
 ## 6. Current State
 
@@ -85,6 +93,7 @@ M1: implemented and verified
 M2: implemented and verified
 M3: implemented and verified; browser network acceptance pending
 M4: implemented and automated verification passing; browser IndexedDB/UI acceptance pending
-Functional product completion: approximately 58%
-Next target: M5 Markdown and JSON Archive Generation
+M5: implemented and automated verification passing; real Chrome download acceptance pending
+Functional product completion: approximately 68%
+Next target: M6 Offline Agent Controller and Quality System
 ```
