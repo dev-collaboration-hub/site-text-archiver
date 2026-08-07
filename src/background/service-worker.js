@@ -4,6 +4,7 @@ import { loadSettings, saveSettings } from "../storage/settings-store.js";
 import { MESSAGE_TYPES } from "../messaging/message-types.js";
 import { validateMessage } from "../messaging/message-validator.js";
 import { publishProgressEvent } from "../messaging/event-publisher.js";
+import { downloadArchiveFiles } from "../export/download-adapter.js";
 import { clearCrawlTick, CRAWL_TICK_ALARM, scheduleCrawlTick } from "./alarm-adapter.js";
 import { createRuntimeController } from "./runtime-controller.js";
 
@@ -54,7 +55,7 @@ async function handleMessage(message) {
       if (!summary.ok) return summary;
       return success({
         state: summary.value.lifecycle,
-        milestone: "M4",
+        milestone: "M5",
         version: APP_VERSION,
         activeCrawl: summary.value.crawlId ? summary.value : null
       });
@@ -102,6 +103,22 @@ async function handleMessage(message) {
         message.payload.offset,
         message.payload.limit
       );
+
+    case MESSAGE_TYPES.EXPORT_ARCHIVE: {
+      const built = await runtimeController.buildExport(message.payload.crawlId, {
+        includeEmptyFailureReport: message.payload.includeEmptyFailureReport === true
+      });
+      if (!built.ok) return built;
+      const downloaded = await downloadArchiveFiles(built.value.files, chrome.downloads);
+      if (!downloaded.ok) return downloaded;
+      return success({
+        crawlId: message.payload.crawlId,
+        buildVersion: built.value.buildVersion,
+        pageCount: built.value.pageOrder.length,
+        failureCount: built.value.failureReport.count,
+        downloads: downloaded.value.downloads
+      });
+    }
 
     case MESSAGE_TYPES.OPEN_DASHBOARD:
       await chrome.tabs.create({ url: chrome.runtime.getURL("dashboard/dashboard.html") });
