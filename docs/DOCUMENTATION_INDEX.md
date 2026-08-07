@@ -30,11 +30,12 @@ This file is the authoritative entry point for the Site Text Archiver documentat
 14. `docs/M2_IMPLEMENTATION_REPORT.md`
 15. `docs/M3_IMPLEMENTATION_REPORT.md`
 16. `docs/M4_IMPLEMENTATION_REPORT.md`
+17. `docs/M5_IMPLEMENTATION_REPORT.md`
 
 ### Execution and deferred work
 
-17. `docs/SOLO_IMPLEMENTATION_PLAN.md`
-18. `docs/DEFERRED_SECURITY_PRIVACY_WORK.md`
+18. `docs/SOLO_IMPLEMENTATION_PLAN.md`
+19. `docs/DEFERRED_SECURITY_PRIVACY_WORK.md`
 
 ## 3. Document Responsibilities
 
@@ -45,7 +46,7 @@ This file is the authoritative entry point for the Site Text Archiver documentat
 | `ROADMAP.md` | Milestone sequence, acceptance criteria, and product progress | Delivery plan |
 | `ARCHITECTURE.md` | Runtime components, data flow, and architectural decisions | System design |
 | `MODULE_SPECIFICATIONS.md` | Module responsibilities, interfaces, and completion criteria | Module design |
-| `API_MESSAGE_DATA_CONTRACTS.md` | Runtime messages, data records, result shapes, and reason codes | Interface contract |
+| `API_MESSAGE_DATA_CONTRACTS.md` | Baseline runtime messages, data records, result shapes, and reason codes | Interface contract |
 | `ALGORITHMS_AND_PSEUDOCODE.md` | Deterministic algorithms, scoring, and transitions | Algorithm design |
 | `SCRATCH_DEVELOPMENT_STANDARD.md` | No-dependency engineering rules and implementation constraints | Engineering standard |
 | `TESTING_STRATEGY.md` | Test layers, fixtures, coverage, and release evidence | Verification strategy |
@@ -56,6 +57,7 @@ This file is the authoritative entry point for the Site Text Archiver documentat
 | `M2_IMPLEMENTATION_REPORT.md` | M2 queue, lifecycle, persistence, and recovery evidence | M2 evidence |
 | `M3_IMPLEMENTATION_REPORT.md` | M3 fetching, response classification, link discovery, scheduling, and persistence evidence | M3 evidence |
 | `M4_IMPLEMENTATION_REPORT.md` | M4 parsing, cleanup, main-content selection, semantic extraction, PageRecord persistence, tests, and CI evidence | M4 evidence |
+| `M5_IMPLEMENTATION_REPORT.md` | M5 Markdown/JSON conversion, archive ordering, reports, runtime export, browser download integration, tests, and CI evidence | M5 evidence |
 | `SOLO_IMPLEMENTATION_PLAN.md` | Execution loop, definition of done, and repository policy | Execution policy |
 | `DEFERRED_SECURITY_PRIVACY_WORK.md` | Deferred hardening tasks and release boundaries | Deferred scope register |
 
@@ -63,12 +65,14 @@ This file is the authoritative entry point for the Site Text Archiver documentat
 
 1. Product behavior and scope: `PROJECT_SPECIFICATION.md`
 2. Milestone status and sequence: `ROADMAP.md`
-3. Public interfaces and stored data: `API_MESSAGE_DATA_CONTRACTS.md`
-4. Module boundaries: `MODULE_SPECIFICATIONS.md`
-5. Algorithm details: `ALGORITHMS_AND_PSEUDOCODE.md`
-6. Test requirements: `TESTING_STRATEGY.md`
-7. UI behavior: `UI_USER_FLOW_SPECIFICATION.md`
-8. Implemented evidence: milestone implementation reports
+3. Baseline public interfaces and stored data: `API_MESSAGE_DATA_CONTRACTS.md`
+4. Implemented milestone-specific interface extensions: milestone implementation reports
+5. Module boundaries: `MODULE_SPECIFICATIONS.md`
+6. Algorithm details: `ALGORITHMS_AND_PSEUDOCODE.md`
+7. Test requirements: `TESTING_STRATEGY.md`
+8. UI behavior: `UI_USER_FLOW_SPECIFICATION.md`
+
+If a newer implemented milestone introduces an interface not yet consolidated into the baseline contract document, its implementation report and source code define the current extension until the baseline contract is consolidated.
 
 ## 5. Current Status
 
@@ -80,11 +84,12 @@ M1: URL intelligence and safety implemented and verified
 M2: crawl queue and state machine implemented and verified
 M3: page fetching and link discovery implemented and verified
 M4: semantic content extraction implemented; dependency-free CI verification passing
-Functional product completion: approximately 58%
-Next target: M5 Markdown and JSON Archive Generation
+M5: deterministic Markdown/JSON archive export implemented; dependency-free CI verification passing
+Functional product completion: approximately 68%
+Next target: M6 Offline Agent Controller and Quality System
 ```
 
-The current runtime can crawl approved pages and convert accepted HTML into structured semantic PageRecords. M5 will generate deterministic archives from those records.
+The current runtime can crawl approved pages, extract semantic PageRecords, and export terminal crawl snapshots as source-backed Markdown/JSON/report files.
 
 ## 6. Synchronization Policy
 
