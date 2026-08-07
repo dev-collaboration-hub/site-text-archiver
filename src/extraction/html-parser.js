@@ -60,22 +60,24 @@ export function parseHtml(html) {
   const stack = [documentNode];
   const warnings = [];
   let index = 0;
+  const lowerHtml = html.toLowerCase();
 
   try {
     while (index < html.length) {
       const parent = stack[stack.length - 1];
       if (parent.type === "element" && RAW_TEXT_ELEMENTS.has(parent.tagName)) {
         const closeNeedle = `</${parent.tagName}`;
-        const lower = html.toLowerCase();
-        const closeIndex = lower.indexOf(closeNeedle, index);
+        const closeIndex = lowerHtml.indexOf(closeNeedle, index);
         if (closeIndex === -1) {
           appendText(parent, html.slice(index));
           warnings.push({ code: "UNCLOSED_RAW_TEXT", tagName: parent.tagName });
           break;
         }
-        appendText(parent, html.slice(index, closeIndex));
-        index = closeIndex;
-        continue;
+        if (closeIndex > index) {
+          appendText(parent, html.slice(index, closeIndex));
+          index = closeIndex;
+          continue;
+        }
       }
 
       const lt = html.indexOf("<", index);
@@ -134,9 +136,7 @@ export function parseHtml(html) {
       if (!selfClosing && !VOID_ELEMENTS.has(tagName)) stack.push(node);
     }
 
-    if (stack.length > 1) {
-      warnings.push({ code: "AUTO_CLOSED_ELEMENTS", count: stack.length - 1 });
-    }
+    if (stack.length > 1) warnings.push({ code: "AUTO_CLOSED_ELEMENTS", count: stack.length - 1 });
     return success({ document: documentNode, warnings });
   } catch (error) {
     return failure("HTML_PARSE_FAILED", "HTML could not be parsed", false, {
