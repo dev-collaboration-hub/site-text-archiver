@@ -30,7 +30,7 @@ async function processCrawlerTick() {
   try {
     const processed = await runtimeController.processNextTask();
     if (!processed.ok) {
-      console.warn("Site Text Archiver M3 crawl tick failed", processed.error);
+      console.warn("Site Text Archiver crawl/extraction tick failed", processed.error);
       return processed;
     }
     if (processed.value.shouldContinue) {
@@ -54,7 +54,7 @@ async function handleMessage(message) {
       if (!summary.ok) return summary;
       return success({
         state: summary.value.lifecycle,
-        milestone: "M3",
+        milestone: "M4",
         version: APP_VERSION,
         activeCrawl: summary.value.crawlId ? summary.value : null
       });
