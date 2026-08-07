@@ -78,6 +78,23 @@ export async function getFetchedHtml(crawlId, taskId, indexedDBFactory = globalT
   }
 }
 
+export async function deleteFetchedHtml(crawlId, taskId, indexedDBFactory = globalThis.indexedDB) {
+  let db;
+  try {
+    db = await openDatabase(indexedDBFactory);
+    const transaction = db.transaction(STORE_NAME, "readwrite");
+    transaction.objectStore(STORE_NAME).delete(`${crawlId}:${taskId}`);
+    await transactionPromise(transaction, null);
+    return success({ crawlId, taskId, deleted: true });
+  } catch (error) {
+    return failure("FETCHED_HTML_DELETE_FAILED", "Fetched HTML record could not be deleted", true, {
+      message: error instanceof Error ? error.message : String(error)
+    });
+  } finally {
+    db?.close?.();
+  }
+}
+
 export async function deleteFetchedHtmlForCrawl(crawlId, indexedDBFactory = globalThis.indexedDB) {
   let db;
   try {
