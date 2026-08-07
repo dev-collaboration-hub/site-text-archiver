@@ -1,9 +1,10 @@
 {
   "manifest_version": 3,
   "name": "Site Text Archiver",
-  "version": "0.3.0",
-  "description": "Local-first documentation archiver with offline URL intelligence and a persisted crawl state machine.",
-  "permissions": ["storage", "activeTab"],
+  "version": "0.4.0",
+  "description": "Local-first documentation archiver with offline URL intelligence, persisted crawl state, and bounded page fetching.",
+  "permissions": ["storage", "activeTab", "alarms"],
+  "optional_host_permissions": ["http://*/*", "https://*/*"],
   "action": {
     "default_title": "Site Text Archiver",
     "default_popup": "popup/popup.html"
