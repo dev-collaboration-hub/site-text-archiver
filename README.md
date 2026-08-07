@@ -15,14 +15,15 @@ This project is being completed through a **single-owner implementation workflow
 
 - Documentation foundation: **100% for the current approved scope**
 - M0 extension foundation: implemented
-- M1 URL intelligence and safety: implemented and pure-module verified
-- M2 crawl queue and state machine: **implemented and verified**
-- Extension version: **0.3.0**
+- M1 URL intelligence and safety: implemented and verified
+- M2 crawl queue and state machine: implemented and verified
+- M3 page fetching and link discovery: **implemented and verified with local core and mocked-flow tests**
+- Extension version: **0.4.0**
 - Chrome load-unpacked/manual acceptance: not yet recorded
-- Current functional product completion: **approximately 32%**
-- Next implementation target: **M3 Page Fetching and Link Discovery**
+- Current functional product completion: **approximately 43%**
+- Next implementation target: **M4 Semantic Content Extraction**
 
-Documentation completion does not mean the working product is complete. Product progress is measured from implemented and verified milestone capability.
+Product progress is measured from implemented milestone capability, not documentation volume.
 
 ## Project Goal
 
@@ -47,7 +48,7 @@ The agent is deterministic and fully offline. It is not a hosted LLM or external
 - Return source-backed extractive answers
 - Operate without npm packages, a backend, or a hosted AI API
 
-## Implemented Foundation
+## Implemented Milestones
 
 ### M0 — Extension Foundation
 
@@ -61,54 +62,62 @@ The agent is deterministic and fully offline. It is not a hosted LLM or external
 
 ### M1 — URL Intelligence and Safety
 
-- Relative and absolute HTTP/HTTPS URL resolution
+- Relative and absolute URL resolution
 - Canonical URL normalization
 - Tracking-query removal and deterministic query sorting
-- Stable canonical keys
-- Exact origin and path-segment-aware scope checks
-- Include and exclude patterns
-- Downloadable-file blocking
+- Exact origin and path checks
+- Include/exclude patterns
+- Blocked-extension filtering
 - Unsafe action-link detection
-- Page and depth limit decisions
-- Duplicate URL detection
-- Machine-readable reason codes and evidence
+- Duplicate canonical URL detection
+- Machine-readable reason codes
 
 ### M2 — Crawl Queue and State Machine
 
+- Deterministic bounded priority queue
+- Crawl lifecycle transitions
+- Start, pause, resume, and cancel commands
+- Persisted queue, counts, events, and request cache
+- Idempotent state-changing commands
+- Service-worker restart recovery
+- Popup lifecycle controls
+- Dashboard runtime state
+
+### M3 — Page Fetching and Link Discovery
+
 ```text
-src/crawler/crawl-config.js
-src/crawler/crawl-run.js
-src/crawler/crawl-state.js
-src/crawler/state-transition.js
-src/crawler/task-record.js
-src/crawler/priority-task-queue.js
-src/crawler/progress-events.js
-src/messaging/request-cache.js
-src/messaging/event-publisher.js
-src/storage/crawl-store.js
-src/background/runtime-controller.js
+src/crawler/response-classifier.js
+src/crawler/fetcher.js
+src/crawler/link-discovery.js
+src/crawler/fetch-record.js
+src/crawler/network-crawler.js
+src/storage/page-html-store.js
+src/background/alarm-adapter.js
 ```
 
-M2 provides:
+M3 provides:
 
-- Deterministic bounded priority queue
-- Stable queue ordering and duplicate rejection
-- Crawl lifecycle transition validation
-- Start, pause, resume, and cancel commands
-- State-version conflict detection
-- Persisted queue, run statistics, and progress events
-- Idempotent request replay protection
-- Service-worker restart recovery
-- Interrupted-task requeueing
-- Preservation of completed tasks during recovery
-- Popup crawl controls
-- Dashboard counts and recent event history
+- GET-only bounded HTML fetching
+- Timeout and cooperative Pause/Cancel cancellation
+- Temporary/permanent HTTP failure classification
+- Retry-After-aware retry scheduling
+- HTML content-type and byte-size validation
+- Redirect final-URL M1 revalidation
+- Scratch-built HTML start-tag scanner
+- `<base href>` support
+- Canonical-link awareness
+- Deterministic connected-link discovery
+- M1 validation before discovered links enter the M2 queue
+- Raw fetched HTML persisted in IndexedDB for M4
+- Fetch metadata persisted with the crawl state
+- Manifest V3 alarm-driven one-task-at-a-time processing
+- Per-origin optional host permission requested when the user creates a crawl
 
 ## Current Runtime Boundary
 
-M2 can create and persist a safe seed queue, enter `RUNNING`, pause, resume, cancel, and recover after service-worker suspension.
+M3 can now perform a real bounded documentation crawl through the fetch-and-discovery stage.
 
-**It does not fetch website pages yet.** M3 adds the network processing loop, HTML response classification, and connected-link discovery.
+Successful pages end in `FETCHED`, and their source HTML is stored locally. **Semantic extraction is not implemented yet.** M4 will transform those fetched pages into structured headings, paragraphs, lists, tables, code blocks, links, and metadata.
 
 ## Technology
 
@@ -117,9 +126,7 @@ M2 can create and persist a safe seed queue, enter `RUNNING`, pause, resume, can
 - HTML and CSS
 - Chrome Extension APIs
 - URL and Fetch APIs
-- DOMParser
 - IndexedDB and extension-local storage
-- Web Workers
 - Browser-native Web Crypto
 
 No npm package, external JavaScript library, hosted AI model, online LLM API, backend server, or cloud database is required.
@@ -140,12 +147,10 @@ No npm package, external JavaScript library, hosted AI model, online LLM API, ba
 2. Open the extension popup.
 3. Review the detected start URL, origin, and allowed path.
 4. Set page, depth, delay, retry, include, and exclude rules.
-5. Click **Save setup**.
-6. Click **Create** to validate the start URL and persist the seed queue.
-7. Use **Start**, **Pause**, **Resume**, or **Cancel** to control the M2 lifecycle.
-8. Open the dashboard to inspect queue counts and progress events.
-
-At the current milestone, starting changes and persists the crawl lifecycle; actual page downloading begins in M3.
+5. Click **Create** and approve access to that configured origin.
+6. Click **Start** to begin fetching approved HTML pages.
+7. Use **Pause**, **Resume**, or **Cancel** when needed.
+8. Open the dashboard to inspect queued, fetched, skipped, failed, and progress-event state.
 
 ## Planned End-to-End Flow
 
@@ -170,10 +175,9 @@ Key implementation evidence:
 
 - `docs/M1_IMPLEMENTATION_REPORT.md`
 - `docs/M2_IMPLEMENTATION_REPORT.md`
+- `docs/M3_IMPLEMENTATION_REPORT.md`
 - `docs/REQUIREMENTS_TRACEABILITY.md`
 - `docs/M0_BROWSER_ACCEPTANCE_CHECKLIST.md`
-
-The documentation foundation is complete for the currently approved scope and must remain synchronized as implementation progresses.
 
 ## License
 
