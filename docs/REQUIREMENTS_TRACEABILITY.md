@@ -27,11 +27,14 @@ This document maps product capabilities to milestones, source files, and verific
 | Deterministic task queue | M2 | `task-record.js`, `priority-task-queue.js` | Ordering, duplicate, dequeue, and snapshot tests | Verified locally |
 | Persisted resumable crawl state | M2 | `src/storage/crawl-store.js`, `runtime-controller.js` | Mocked storage and restart-recovery tests | Verified locally |
 | Idempotent state-changing commands | M2 | `request-cache.js`, `runtime-controller.js` | Request replay and misuse tests | Verified locally |
-| Pause, resume, and cancel controls | M2 | service worker, popup, runtime controller | State-flow tests; browser controls | Implemented and locally verified; manual browser acceptance pending |
-| Crawl counts and progress events | M2 | `crawl-run.js`, `progress-events.js`, dashboard | Event and summary integration tests | Verified locally |
-| Bounded HTML fetching | M3 | planned `src/crawler/fetcher.js` and response policy | Timeout, response, and content-type tests | Documented |
-| Link discovery and base URL handling | M3 | planned discovery modules | Fixture-site tests | Documented |
-| Failure and retry classification | M3 | planned fetch/recovery modules | Temporary/permanent failure tests | Documented |
+| Pause, resume, and cancel controls | M2/M3 | service worker, popup, runtime controller, fetcher | State-flow and cooperative abort tests | Implemented and locally verified; manual browser acceptance pending |
+| Crawl counts and progress events | M2/M3 | `crawl-run.js`, `progress-events.js`, dashboard | Event and summary integration tests | Verified locally |
+| Bounded HTML fetching | M3 | `fetcher.js`, `response-classifier.js` | Pure response/fetch tests and M3 regression suite | Verified locally |
+| Link discovery and base URL handling | M3 | `link-discovery.js` | Scratch-scanner, base, canonical, dedupe, entity tests | Verified locally |
+| Failure and retry classification | M3 | `response-classifier.js`, `network-crawler.js` | Retry-After, temporary/permanent, mocked-flow tests | Verified locally |
+| Redirect and discovered-link safety | M3 | `network-crawler.js` + M1 URL intelligence | Mocked fetch→discover→queue flow | Verified locally |
+| Fetched HTML persistence | M3 | `page-html-store.js`, `fetch-record.js` | Integration contract and mocked processing loop | Implemented; browser IndexedDB acceptance pending |
+| Manifest V3 network scheduling | M3 | `alarm-adapter.js`, service worker | Code-path verification; browser alarm acceptance pending | Implemented; manual browser acceptance pending |
 | Semantic content extraction | M4 | planned `src/extraction/` | HTML fixture and golden-output tests | Documented |
 | Markdown and JSON archive export | M5 | planned `src/export/` | Golden Markdown and JSON tests | Documented |
 | Offline agent quality and bounded recovery | M6 | planned `src/agent/`, `src/quality/` | Deterministic decision and scoring tests | Documented |
@@ -46,52 +49,34 @@ Source and smoke tests exist for the extension shell, messages, settings, identi
 
 ## 5. M1 Evidence
 
-Source:
-
-```text
-src/crawler/query-policy.js
-src/crawler/url-resolver.js
-src/crawler/url-normalizer.js
-src/crawler/blocked-extensions.js
-src/crawler/link-safety.js
-src/crawler/scope-guard.js
-src/crawler/duplicate-url-registry.js
-src/crawler/url-intelligence.js
-```
-
-Tests:
-
-```text
-tests/unit/index.test.js
-tests/unit/m1-edge.test.js
-```
-
 Detailed evidence: `M1_IMPLEMENTATION_REPORT.md`.
 
 ## 6. M2 Evidence
 
+Detailed evidence: `M2_IMPLEMENTATION_REPORT.md`.
+
+## 7. M3 Evidence
+
 Source:
 
 ```text
-src/crawler/crawl-config.js
-src/crawler/crawl-run.js
-src/crawler/crawl-state.js
-src/crawler/state-transition.js
-src/crawler/task-record.js
-src/crawler/priority-task-queue.js
-src/crawler/progress-events.js
-src/messaging/request-cache.js
-src/messaging/event-publisher.js
-src/storage/crawl-store.js
-src/background/runtime-controller.js
+src/crawler/response-classifier.js
+src/crawler/fetcher.js
+src/crawler/link-discovery.js
+src/crawler/fetch-record.js
+src/crawler/network-crawler.js
+src/storage/page-html-store.js
+src/background/alarm-adapter.js
 ```
 
 Integration:
 
 ```text
-src/messaging/message-types.js
-src/messaging/message-validator.js
+src/background/runtime-controller.js
 src/background/service-worker.js
+src/crawler/crawl-run.js
+src/crawler/progress-events.js
+manifest.json
 popup/
 dashboard/
 ```
@@ -99,23 +84,21 @@ dashboard/
 Tests:
 
 ```text
-tests/unit/m2.test.js
-tests/unit/m2-recovery.test.js
+tests/unit/m3.test.js
 ```
 
-Verified behavior includes deterministic queue order, state-transition rejection, idempotent commands, persisted lifecycle controls, interrupted-task requeueing, and preservation of completed tasks during simulated service-worker recovery.
+Local execution verified response classification, Retry-After, scratch link discovery, bounded fetching, and a mocked fetch → store → discover → M1 approve → queue processing flow.
 
-Detailed evidence: `M2_IMPLEMENTATION_REPORT.md`.
+Detailed evidence: `M3_IMPLEMENTATION_REPORT.md`.
 
-## 7. Current State
+## 8. Current State
 
 ```text
 Documentation foundation: 100% for current approved scope
 M0: implemented; manual Chrome acceptance pending
 M1: implemented and locally verified
 M2: implemented and locally verified
-Functional product completion: approximately 32%
-Next target: M3 Page Fetching and Link Discovery
+M3: implemented and locally verified; browser load-unpacked/network acceptance pending
+Functional product completion: approximately 43%
+Next target: M4 Semantic Content Extraction
 ```
-
-M2 does not claim website fetching. Network processing starts in M3.
