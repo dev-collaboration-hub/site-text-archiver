@@ -12,6 +12,9 @@ export async function fetchHtmlPage(input = {}, dependencies = {}) {
   const fetchImpl = dependencies.fetchImpl ?? globalThis.fetch;
   const now = typeof dependencies.now === "function" ? dependencies.now : () => Date.now();
   const AbortControllerImpl = dependencies.AbortControllerImpl ?? globalThis.AbortController;
+  const externalSignal = typeof dependencies.externalSignalProvider === "function"
+    ? dependencies.externalSignalProvider()
+    : dependencies.signal ?? input.signal ?? null;
   if (typeof fetchImpl !== "function" || typeof AbortControllerImpl !== "function") {
     return failure("FETCH_RUNTIME_UNAVAILABLE", "Fetch runtime is unavailable");
   }
@@ -19,6 +22,13 @@ export async function fetchHtmlPage(input = {}, dependencies = {}) {
   const maxHtmlBytes = Number.isInteger(input.maxHtmlBytes) ? input.maxHtmlBytes : 5_000_000;
   const startedAt = now();
   const controller = new AbortControllerImpl();
+  let externallyAborted = Boolean(externalSignal?.aborted);
+  const abortFromExternal = () => {
+    externallyAborted = true;
+    controller.abort();
+  };
+  if (externalSignal?.addEventListener) externalSignal.addEventListener("abort", abortFromExternal, { once: true });
+  if (externallyAborted) controller.abort();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
@@ -74,10 +84,11 @@ export async function fetchHtmlPage(input = {}, dependencies = {}) {
       durationMs: Math.max(0, finishedAt - startedAt)
     });
   } catch (error) {
-    const timedOut = controller.signal.aborted;
+    const timedOut = controller.signal.aborted && !externallyAborted;
+    const code = externallyAborted ? "FETCH_CANCELLED" : timedOut ? "FETCH_TIMEOUT" : "NETWORK_ERROR";
     return failure(
-      timedOut ? "FETCH_TIMEOUT" : "NETWORK_ERROR",
-      timedOut ? "Page fetch timed out" : "Page fetch failed",
+      code,
+      externallyAborted ? "Page fetch was cancelled" : timedOut ? "Page fetch timed out" : "Page fetch failed",
       true,
       {
         disposition: "RETRY",
@@ -86,5 +97,6 @@ export async function fetchHtmlPage(input = {}, dependencies = {}) {
     );
   } finally {
     clearTimeout(timer);
+    if (externalSignal?.removeEventListener) externalSignal.removeEventListener("abort", abortFromExternal);
   }
 }
