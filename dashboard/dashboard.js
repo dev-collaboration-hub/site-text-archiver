@@ -14,8 +14,12 @@ const elements = {
   eventList: document.querySelector("#event-list"),
   settingsList: document.querySelector("#settings-list"),
   status: document.querySelector("#status"),
-  refreshButton: document.querySelector("#refresh-button")
+  refreshButton: document.querySelector("#refresh-button"),
+  exportButton: document.querySelector("#export-button")
 };
+
+const TERMINAL_STATES = new Set(["COMPLETED", "CANCELLED", "FAILED"]);
+let activeCrawlId = null;
 
 function renderDefinitionList(element, entries) {
   element.replaceChildren();
@@ -55,6 +59,7 @@ function renderPages(pages = []) {
 }
 
 function renderCrawl(summary) {
+  activeCrawlId = summary?.crawlId ?? null;
   const counts = summary?.counts ?? {};
   elements.queuedCount.textContent = String(counts.queued ?? 0);
   elements.fetchedCount.textContent = String(counts.fetched ?? 0);
@@ -75,6 +80,7 @@ function renderCrawl(summary) {
     ["Failed", counts.failed ?? 0]
   ] : [["Status", "No active crawl"]]);
   renderPages(summary?.pageSummaries ?? []);
+  elements.exportButton.disabled = !summary || !TERMINAL_STATES.has(summary.lifecycle) || (summary.extractedPageCount ?? 0) === 0;
 }
 
 function renderEvents(events) {
@@ -126,10 +132,24 @@ async function refresh() {
   } else {
     renderEvents([]);
   }
-  elements.status.textContent = "M4 runtime connected.";
+  elements.status.textContent = "M5 runtime connected.";
 }
 
 elements.refreshButton.addEventListener("click", () => void refresh());
+elements.exportButton.addEventListener("click", async () => {
+  if (!activeCrawlId) return;
+  elements.exportButton.disabled = true;
+  elements.status.textContent = "Building deterministic archive…";
+  const result = await sendRuntimeMessage(MESSAGE_TYPES.EXPORT_ARCHIVE, { crawlId: activeCrawlId });
+  if (!result.ok) {
+    elements.status.textContent = result.error.message;
+    await refresh();
+    return;
+  }
+  const names = result.value.downloads.map(item => item.filename).join(", ");
+  elements.status.textContent = `Archive ready: ${names}`;
+  await refresh();
+});
 chrome.runtime.onMessage.addListener(event => {
   if (event?.eventId) void refresh();
 });
