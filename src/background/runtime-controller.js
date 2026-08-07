@@ -4,6 +4,7 @@ import { failure, success } from "../shared/result.js";
 import { createCrawlConfig } from "../crawler/crawl-config.js";
 import { createCrawlRun, createCrawlSummary, syncRunCounts } from "../crawler/crawl-run.js";
 import { CRAWL_EVENTS, isTerminal } from "../crawler/crawl-state.js";
+import { processNextNetworkTask } from "../crawler/network-crawler.js";
 import { appendProgressEvent, PROGRESS_EVENT_TYPES } from "../crawler/progress-events.js";
 import { createPriorityTaskQueue } from "../crawler/priority-task-queue.js";
 import { applyRunTransition } from "../crawler/state-transition.js";
@@ -11,6 +12,7 @@ import { createTaskRecord, TASK_STATES } from "../crawler/task-record.js";
 import { inspectUrl } from "../crawler/url-intelligence.js";
 import { findCachedRequest, rememberRequest } from "../messaging/request-cache.js";
 import { loadActiveCrawl, repairInterruptedSnapshot, saveActiveCrawl } from "../storage/crawl-store.js";
+import { putFetchedHtml } from "../storage/page-html-store.js";
 
 function taskIdFor(crawlId, sequence) {
   return `task_${crawlId}_${sequence}`;
@@ -131,6 +133,7 @@ export function createRuntimeController(options = {}) {
           nextDiscoverySequence: 2
         },
         queue: queue.snapshot(),
+        fetchRecords: [],
         events: [],
         requestCache: []
       };
@@ -229,9 +232,10 @@ export function createRuntimeController(options = {}) {
         crawlId: null,
         lifecycle: CRAWL_STATES.IDLE,
         stateVersion: 0,
-        counts: { discovered: 0, queued: 0, fetching: 0, completed: 0, skipped: 0, failed: 0 },
+        counts: { discovered: 0, queued: 0, fetching: 0, fetched: 0, completed: 0, skipped: 0, failed: 0 },
         currentTask: null,
         queuedTasks: 0,
+        fetchedPageCount: 0,
         recentEventCount: 0,
         createdAt: null,
         updatedAt: null
@@ -283,6 +287,18 @@ export function createRuntimeController(options = {}) {
     return persist(snapshot);
   }
 
+  async function processNextTask() {
+    const loaded = await load();
+    if (!loaded.ok) return loaded;
+    if (!loaded.value) return success({ action: "IDLE", shouldContinue: false, nextDelayMs: null });
+    return processNextNetworkTask(loaded.value, {
+      now: clock,
+      persistSnapshot: persist,
+      putFetchedHtml: record => putFetchedHtml(record, options.indexedDBFactory),
+      fetchDependencies: options.fetchDependencies
+    });
+  }
+
   return Object.freeze({
     createCrawl,
     startCrawl: message => mutateCrawl(message, CRAWL_EVENTS.START, PROGRESS_EVENT_TYPES.CRAWL_STARTED),
@@ -291,6 +307,7 @@ export function createRuntimeController(options = {}) {
     cancelCrawl: message => mutateCrawl(message, CRAWL_EVENTS.CANCEL, PROGRESS_EVENT_TYPES.CRAWL_CANCELLED, { cancelTasks: true }),
     getSummary,
     getEvents,
-    restoreActiveCrawl
+    restoreActiveCrawl,
+    processNextTask
   });
 }
