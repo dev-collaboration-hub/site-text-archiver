@@ -29,11 +29,12 @@ This file is the authoritative entry point for the Site Text Archiver documentat
 13. `docs/M1_IMPLEMENTATION_REPORT.md`
 14. `docs/M2_IMPLEMENTATION_REPORT.md`
 15. `docs/M3_IMPLEMENTATION_REPORT.md`
+16. `docs/M4_IMPLEMENTATION_REPORT.md`
 
 ### Execution and deferred work
 
-16. `docs/SOLO_IMPLEMENTATION_PLAN.md`
-17. `docs/DEFERRED_SECURITY_PRIVACY_WORK.md`
+17. `docs/SOLO_IMPLEMENTATION_PLAN.md`
+18. `docs/DEFERRED_SECURITY_PRIVACY_WORK.md`
 
 ## 3. Document Responsibilities
 
@@ -54,6 +55,7 @@ This file is the authoritative entry point for the Site Text Archiver documentat
 | `M1_IMPLEMENTATION_REPORT.md` | M1 URL intelligence evidence | M1 evidence |
 | `M2_IMPLEMENTATION_REPORT.md` | M2 queue, lifecycle, persistence, and recovery evidence | M2 evidence |
 | `M3_IMPLEMENTATION_REPORT.md` | M3 fetching, response classification, link discovery, scheduling, and persistence evidence | M3 evidence |
+| `M4_IMPLEMENTATION_REPORT.md` | M4 parsing, cleanup, main-content selection, semantic extraction, PageRecord persistence, tests, and CI evidence | M4 evidence |
 | `SOLO_IMPLEMENTATION_PLAN.md` | Execution loop, definition of done, and repository policy | Execution policy |
 | `DEFERRED_SECURITY_PRIVACY_WORK.md` | Deferred hardening tasks and release boundaries | Deferred scope register |
 
@@ -74,14 +76,15 @@ This file is the authoritative entry point for the Site Text Archiver documentat
 
 ```text
 M0: source foundation implemented; manual Chrome acceptance pending
-M1: URL intelligence and safety implemented and locally verified
-M2: crawl queue and state machine implemented and locally verified
-M3: page fetching and link discovery implemented and locally verified
-Functional product completion: approximately 43%
-Next target: M4 Semantic Content Extraction
+M1: URL intelligence and safety implemented and verified
+M2: crawl queue and state machine implemented and verified
+M3: page fetching and link discovery implemented and verified
+M4: semantic content extraction implemented; dependency-free CI verification passing
+Functional product completion: approximately 58%
+Next target: M5 Markdown and JSON Archive Generation
 ```
 
-M3 now performs the real bounded network crawl and stores accepted HTML locally. Semantic extraction begins in M4.
+The current runtime can crawl approved pages and convert accepted HTML into structured semantic PageRecords. M5 will generate deterministic archives from those records.
 
 ## 6. Synchronization Policy
 
