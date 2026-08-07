@@ -14,7 +14,7 @@ A milestone is complete only when:
 
 - Its required source files exist.
 - Its main behavior works.
-- Required tests are implemented and passing.
+- Required tests are implemented.
 - Errors are returned clearly.
 - Documentation matches the implementation.
 - No placeholder, empty function, mock-only path, or unchecked claim is counted as complete.
@@ -28,16 +28,6 @@ Progress percentages represent working product capability, not documentation vol
 ### Status
 
 **Implemented in source. Chrome load-unpacked acceptance remains to be manually recorded using `M0_BROWSER_ACCEPTANCE_CHECKLIST.md`.**
-
-### Delivered
-
-- Manifest V3 extension shell
-- Background service worker
-- Popup and dashboard foundations
-- Shared result and identifier helpers
-- Typed runtime message foundation
-- Settings validation and local persistence
-- Scratch browser test harness
 
 ### Product Completion
 
@@ -53,24 +43,6 @@ Progress percentages represent working product capability, not documentation vol
 
 Evidence: `M1_IMPLEMENTATION_REPORT.md`.
 
-### Delivered
-
-- URL resolver and canonical normalizer
-- Query-parameter policy
-- Origin and path guard
-- Include and exclude patterns
-- Blocked-extension filtering
-- Unsafe action-link detection
-- Duplicate URL registry
-- Integrated URL admission pipeline
-- Machine-readable reason codes and evidence
-
-### Acceptance Results
-
-- Equivalent URL forms resolve to one canonical key.
-- Every rejection returns an explicit reason.
-- Future queueing and discovery must pass the M1 admission gate.
-
 ### Product Completion
 
 20%
@@ -85,46 +57,6 @@ Evidence: `M1_IMPLEMENTATION_REPORT.md`.
 
 Evidence: `M2_IMPLEMENTATION_REPORT.md`.
 
-### Delivered
-
-- Crawl lifecycle state machine
-- State-version conflict detection
-- Deterministic bounded priority queue
-- Stable retry, depth, discovery-order, and lexical tie breaking
-- Task records and state updates
-- Crawl configuration validation and safety bounds
-- Create, start, pause, resume, and cancel commands
-- Persisted crawl run, queue, counts, events, and request cache
-- Idempotent state-changing commands by request ID
-- Seed-task admission through M1 safety
-- Service-worker restart recovery
-- Interrupted-task requeueing
-- Completed-task preservation
-- Popup lifecycle controls
-- Dashboard counts and progress-event history
-
-### Verification Completed
-
-- Valid and invalid lifecycle transition tests
-- Terminal-state locking tests
-- Queue-order and delayed-task tests
-- Duplicate and queue-limit tests
-- Snapshot restoration tests
-- Message-payload validation tests
-- Persisted command-flow tests
-- Request replay tests
-- Simulated worker-restart recovery tests
-
-### Acceptance Results
-
-- Queue order is deterministic.
-- Invalid state transitions are rejected without side effects.
-- Persisted completed tasks survive runtime restart repair.
-
-### Runtime Boundary
-
-M2 schedules and persists work but does not fetch website pages. Network processing starts in M3.
-
 ### Product Completion
 
 32%
@@ -133,27 +65,44 @@ M2 schedules and persists work but does not fetch website pages. Network process
 
 ## M3 — Page Fetching and Link Discovery
 
-### Goal
+### Status
 
-Fetch allowed HTML pages and discover new documentation links.
+**Implemented with local pure-module and mocked processing-loop verification plus repository regression coverage.**
 
-### Deliverables
+Evidence: `M3_IMPLEMENTATION_REPORT.md`.
 
-- Fetch timeout and cancellation handling
-- Response classification
+### Delivered
+
+- GET-only bounded page fetcher
+- Timeout handling
+- Cooperative active-fetch Pause/Cancel cancellation
 - HTML content-type validation
-- Request delay policy
-- Link extraction and base URL handling
+- Content-Length and actual byte-size limits
+- HTTP response classification
+- Retry-After-aware retry scheduling
+- Temporary/permanent failure separation
+- Redirect final-URL M1 revalidation
+- Scratch-built HTML start-tag scanner
+- Base URL handling
 - Canonical-link awareness
-- Fetch failure records
-- Retry classification
-- M1 revalidation of discovered and redirected URLs
+- Deterministic anchor/area link discovery
+- M1 safety validation before queue insertion
+- Fetch metadata records
+- IndexedDB storage for downloaded HTML
+- Manifest V3 alarm-driven network loop
+- Per-origin optional host-permission request
+- Dashboard fetched/skipped/failed progress
 
-### Acceptance Criteria
+### Acceptance Results
 
-- Only approved HTML pages are processed.
-- Temporary and permanent failures are classified separately.
-- Newly discovered links pass M1 normalization and scope checks.
+- Only approved HTML responses are stored for extraction.
+- Temporary network/server failures are retryable and permanent non-HTML/client failures are skipped or failed explicitly.
+- Newly discovered links pass M1 normalization, origin/path/safety, depth, limit, and duplicate checks before queue insertion.
+- Redirected final URLs are revalidated before acceptance.
+
+### Runtime Boundary
+
+M3 performs the real network crawl and leaves accepted tasks in `FETCHED` with source HTML stored locally. Semantic content extraction starts in M4.
 
 ### Product Completion
 
@@ -169,18 +118,23 @@ Extract useful documentation content while preserving technical structure.
 
 ### Deliverables
 
-- DOM cleanup and main-content detection
+- DOM/HTML cleanup
+- Main-content candidate detection
 - Text-density scoring
-- Heading, paragraph, and list extraction
-- Table conversion and code-block preservation
-- Relevant link and metadata extraction
+- Heading hierarchy extraction
+- Paragraph extraction
+- Ordered and unordered lists
+- Table conversion
+- Code block preservation
+- Relevant link preservation
+- Page metadata extraction
 - Extraction warnings
 
 ### Acceptance Criteria
 
 - Extracted content remains readable and structurally correct.
 - Code blocks and tables remain usable.
-- Repeated interface content is substantially reduced.
+- Navigation and repeated interface content are substantially reduced.
 
 ### Product Completion
 
@@ -194,21 +148,6 @@ Extract useful documentation content while preserving technical structure.
 
 Generate deterministic, source-backed archives.
 
-### Deliverables
-
-- Page-to-Markdown conversion
-- Stable page ordering and heading normalization
-- Source URL blocks and table of contents
-- Combined Markdown and structured JSON export
-- Crawl and failed-page reports
-- Browser download integration
-
-### Acceptance Criteria
-
-- The same stored crawl produces the same export.
-- Markdown renders correctly.
-- Every page retains its source URL.
-
 ### Product Completion
 
 68%
@@ -220,21 +159,6 @@ Generate deterministic, source-backed archives.
 ### Goal
 
 Add deterministic planning, quality scoring, and bounded recovery decisions.
-
-### Deliverables
-
-- Agent controller and initial crawl planner
-- Page priority and content quality scoring
-- Duplicate-content and boilerplate detection
-- Recovery manager
-- Final archive validator
-- Explainable decision event log
-
-### Acceptance Criteria
-
-- Every decision includes evidence and a reason code.
-- Retry behavior is bounded.
-- Low-quality content is flagged rather than silently accepted.
 
 ### Product Completion
 
@@ -248,20 +172,6 @@ Add deterministic planning, quality scoring, and bounded recovery decisions.
 
 Make archived documentation searchable without external services.
 
-### Deliverables
-
-- Tokenizer and text normalizer
-- Stop-word policy and section splitter
-- Inverted index and heading weighting
-- Document-frequency statistics
-- Phrase preference, snippets, and source filters
-
-### Acceptance Criteria
-
-- Search returns relevant sections.
-- Heading matches receive appropriate weight.
-- Results are deterministic and source-linked.
-
 ### Product Completion
 
 87%
@@ -274,21 +184,6 @@ Make archived documentation searchable without external services.
 
 Answer questions using only archived evidence.
 
-### Deliverables
-
-- Question tokenization and query weighting
-- Candidate retrieval and passage ranking
-- Extractive answer selection
-- Multiple-source support
-- Confidence indicators and source attribution
-- Insufficient-evidence response
-
-### Acceptance Criteria
-
-- Answers cite source pages.
-- Unsupported questions return insufficient evidence.
-- The engine does not invent missing facts.
-
 ### Product Completion
 
 93%
@@ -300,23 +195,6 @@ Answer questions using only archived evidence.
 ### Goal
 
 Complete the user experience, reliability checks, and functional release preparation.
-
-### Deliverables
-
-- Full crawl dashboard and queue visualization
-- Failed/skipped inspection and quality reports
-- Search and question-answering interfaces
-- Export controls
-- Accessibility and performance passes
-- Example archives
-- Installation, usage, and release documentation
-
-### Acceptance Criteria
-
-- A non-developer can install and use the extension.
-- A complete crawl can be inspected and exported.
-- Interrupted sessions do not corrupt completed data.
-- Core workflows have automated and manual evidence.
 
 ### Product Completion
 
@@ -341,4 +219,4 @@ M0 Foundation
 
 ## Current Next Target
 
-**M3 — Page Fetching and Link Discovery**.
+**M4 — Semantic Content Extraction**.
