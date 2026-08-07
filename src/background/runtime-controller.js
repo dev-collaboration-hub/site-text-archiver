@@ -4,6 +4,7 @@ import { failure, success } from "../shared/result.js";
 import { createCrawlConfig } from "../crawler/crawl-config.js";
 import { createCrawlRun, createCrawlSummary, syncRunCounts } from "../crawler/crawl-run.js";
 import { CRAWL_EVENTS, isTerminal } from "../crawler/crawl-state.js";
+import { hasFetchedTasks, processNextExtractionTask } from "../crawler/extraction-runner.js";
 import { processNextNetworkTask } from "../crawler/network-crawler.js";
 import { appendProgressEvent, PROGRESS_EVENT_TYPES } from "../crawler/progress-events.js";
 import { createPriorityTaskQueue } from "../crawler/priority-task-queue.js";
@@ -12,7 +13,8 @@ import { createTaskRecord, TASK_STATES } from "../crawler/task-record.js";
 import { inspectUrl } from "../crawler/url-intelligence.js";
 import { findCachedRequest, rememberRequest } from "../messaging/request-cache.js";
 import { loadActiveCrawl, repairInterruptedSnapshot, saveActiveCrawl } from "../storage/crawl-store.js";
-import { putFetchedHtml } from "../storage/page-html-store.js";
+import { deleteFetchedHtml, getFetchedHtml, putFetchedHtml } from "../storage/page-html-store.js";
+import { putPageRecord } from "../storage/page-record-store.js";
 
 function taskIdFor(crawlId, sequence) {
   return `task_${crawlId}_${sequence}`;
@@ -134,6 +136,7 @@ export function createRuntimeController(options = {}) {
         },
         queue: queue.snapshot(),
         fetchRecords: [],
+        pageSummaries: [],
         events: [],
         requestCache: []
       };
@@ -198,7 +201,7 @@ export function createRuntimeController(options = {}) {
       if (options.cancelTasks) {
         const queue = createPriorityTaskQueue({ maxSize: next.config.maxPages, snapshot: next.queue });
         for (const task of next.queue.tasks) {
-          if (![TASK_STATES.COMPLETED, TASK_STATES.SKIPPED, TASK_STATES.FAILED, TASK_STATES.CANCELLED].includes(task.state)) {
+          if (![TASK_STATES.COMPLETED, TASK_STATES.SKIPPED, TASK_STATES.FAILED, TASK_STATES.CANCELLED, TASK_STATES.EXTRACTED].includes(task.state)) {
             const cancelled = queue.markState(task.taskId, TASK_STATES.CANCELLED, { reasonCode: "CRAWL_CANCELLED" }, now);
             if (!cancelled.ok) return cancelled;
           }
@@ -232,10 +235,16 @@ export function createRuntimeController(options = {}) {
         crawlId: null,
         lifecycle: CRAWL_STATES.IDLE,
         stateVersion: 0,
-        counts: { discovered: 0, queued: 0, fetching: 0, fetched: 0, completed: 0, skipped: 0, failed: 0 },
+        counts: {
+          discovered: 0, queued: 0, fetching: 0, fetched: 0,
+          extracting: 0, extracted: 0, validating: 0,
+          completed: 0, skipped: 0, failed: 0
+        },
         currentTask: null,
         queuedTasks: 0,
         fetchedPageCount: 0,
+        extractedPageCount: 0,
+        pageSummaries: [],
         recentEventCount: 0,
         createdAt: null,
         updatedAt: null
@@ -270,8 +279,7 @@ export function createRuntimeController(options = {}) {
   async function restoreActiveCrawl() {
     const loaded = await load();
     if (!loaded.ok || !loaded.value) return loaded;
-    const needsRepair = Boolean(loaded.value.run.activeTaskId) ||
-      loaded.value.run.lifecycle === CRAWL_STATES.PAUSING;
+    const needsRepair = Boolean(loaded.value.run.activeTaskId) || loaded.value.run.lifecycle === CRAWL_STATES.PAUSING;
     if (!needsRepair) return success(loaded.value);
 
     const now = clock();
@@ -291,6 +299,18 @@ export function createRuntimeController(options = {}) {
     const loaded = await load();
     if (!loaded.ok) return loaded;
     if (!loaded.value) return success({ action: "IDLE", shouldContinue: false, nextDelayMs: null });
+
+    if (hasFetchedTasks(loaded.value)) {
+      return processNextExtractionTask(loaded.value, {
+        now: clock,
+        persistSnapshot: persist,
+        getFetchedHtml: (crawlId, taskId) => getFetchedHtml(crawlId, taskId, options.indexedDBFactory),
+        putPageRecord: record => putPageRecord(record, options.indexedDBFactory),
+        deleteFetchedHtml: (crawlId, taskId) => deleteFetchedHtml(crawlId, taskId, options.indexedDBFactory),
+        cryptoObject
+      });
+    }
+
     return processNextNetworkTask(loaded.value, {
       now: clock,
       persistSnapshot: persist,
