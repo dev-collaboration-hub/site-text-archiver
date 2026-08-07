@@ -28,11 +28,12 @@ This file is the authoritative entry point for the Site Text Archiver documentat
 12. `docs/M0_BROWSER_ACCEPTANCE_CHECKLIST.md`
 13. `docs/M1_IMPLEMENTATION_REPORT.md`
 14. `docs/M2_IMPLEMENTATION_REPORT.md`
+15. `docs/M3_IMPLEMENTATION_REPORT.md`
 
 ### Execution and deferred work
 
-15. `docs/SOLO_IMPLEMENTATION_PLAN.md`
-16. `docs/DEFERRED_SECURITY_PRIVACY_WORK.md`
+16. `docs/SOLO_IMPLEMENTATION_PLAN.md`
+17. `docs/DEFERRED_SECURITY_PRIVACY_WORK.md`
 
 ## 3. Document Responsibilities
 
@@ -50,8 +51,9 @@ This file is the authoritative entry point for the Site Text Archiver documentat
 | `REQUIREMENTS_TRACEABILITY.md` | Capability-to-source and capability-to-test mapping | Traceability control |
 | `UI_USER_FLOW_SPECIFICATION.md` | Popup, dashboard, states, actions, and feedback | UX contract |
 | `M0_BROWSER_ACCEPTANCE_CHECKLIST.md` | Manual Chrome verification | M0 acceptance evidence |
-| `M1_IMPLEMENTATION_REPORT.md` | M1 source, tests, limitations, and integration boundary | M1 evidence |
-| `M2_IMPLEMENTATION_REPORT.md` | M2 queue, lifecycle, persistence, recovery, tests, and M3 boundary | M2 evidence |
+| `M1_IMPLEMENTATION_REPORT.md` | M1 URL intelligence evidence | M1 evidence |
+| `M2_IMPLEMENTATION_REPORT.md` | M2 queue, lifecycle, persistence, and recovery evidence | M2 evidence |
+| `M3_IMPLEMENTATION_REPORT.md` | M3 fetching, response classification, link discovery, scheduling, and persistence evidence | M3 evidence |
 | `SOLO_IMPLEMENTATION_PLAN.md` | Execution loop, definition of done, and repository policy | Execution policy |
 | `DEFERRED_SECURITY_PRIVACY_WORK.md` | Deferred hardening tasks and release boundaries | Deferred scope register |
 
@@ -66,8 +68,6 @@ This file is the authoritative entry point for the Site Text Archiver documentat
 7. UI behavior: `UI_USER_FLOW_SPECIFICATION.md`
 8. Implemented evidence: milestone implementation reports
 
-If implementation and documentation disagree, the discrepancy must be corrected before the milestone is counted complete.
-
 ## 5. Current Status
 
 **Documentation foundation: 100% for the current approved scope.**
@@ -76,23 +76,15 @@ If implementation and documentation disagree, the discrepancy must be corrected 
 M0: source foundation implemented; manual Chrome acceptance pending
 M1: URL intelligence and safety implemented and locally verified
 M2: crawl queue and state machine implemented and locally verified
-Functional product completion: approximately 32%
-Next target: M3 Page Fetching and Link Discovery
+M3: page fetching and link discovery implemented and locally verified
+Functional product completion: approximately 43%
+Next target: M4 Semantic Content Extraction
 ```
 
-M2 does not fetch website pages. It creates and persists safe queue state and lifecycle control; network processing begins in M3.
+M3 now performs the real bounded network crawl and stores accepted HTML locally. Semantic extraction begins in M4.
 
 ## 6. Synchronization Policy
 
-Every milestone must update documentation when it changes:
-
-- Public functions or messages
-- Stored records or schema
-- Reason codes
-- State transitions
-- Limits or defaults
-- User-visible workflows
-- Acceptance criteria
-- Known limitations
+Every milestone must update documentation when it changes public interfaces, stored records, reason codes, state transitions, limits, user-visible workflows, acceptance criteria, or known limitations.
 
 Documentation completeness must never be used as a substitute for working product completion.
